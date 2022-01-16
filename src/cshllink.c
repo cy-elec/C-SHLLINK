@@ -10,4 +10,21 @@
 #include "cshllink.h"
 #include <stdio.h>
 
-
+/*
+        SHLLINK Header
+*/
+struct cshllink_header {
+    int dummy;
+};
+/*
+    SHLLINK LinkTargetIDList
+*/
+struct cshllink_lnktidl {
+    int dummy;
+};
+/*
+    SHLLINK LinkInfo
+*/
+struct cshllink_lnkinfo {
+    int dummy;
+};
