@@ -1,3 +1,5 @@
+#Makefile for compiling static lib
+
 LIBDIR = ../com/
 LIBSRC = ../src/
 LIB_RN = cshllink
