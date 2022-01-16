@@ -7,4 +7,4 @@ This library provides an interface for the Shell Link Binary File Format in C [M
 [Felix Kröhnert](https://github.com/Elec42)
 
 ## LICENSE
-[GNU GPL V3] (LICENSE)
+[GNU GPL V3](LICENSE)
