@@ -1,4 +1,4 @@
-#Makefile for compiling static lib
+#Makefile for compiling static library
 
 LIBDIR = ../com/
 LIBSRC = ../src/
