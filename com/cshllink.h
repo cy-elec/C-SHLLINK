@@ -27,7 +27,6 @@
         uint32_t IconIndex;
         uint32_t ShowCommand;
         uint16_t HotKey;
-        
         /*
             + 10 bytes NULL
         */
@@ -116,71 +115,119 @@
     /*
         SHLLINK ExtraDataBlock (terminated with TerminalBlock (4 Bytes NULL))
     */
+            /*
+            SHLLINK ExtraDataBlock - BlockInfo
+            */
+            struct _cshllink_extdatablk_blk_info{
+                uint32_t BlockSize;
+                uint32_t BlockSignature;
+            };
         /*
             SHLLINK ExtraDataBlock - ConsoleDataBlock
         */
         struct _cshllink_extdatablk_consdblk{
-            int dummy;
+            struct _cshllink_extdatablk_blk_info info;
+            uint16_t FillAttributes;
+            uint16_t PopupFillAttributes;
+            uint16_t ScreenBufferSizeX;
+            uint16_t ScreenBufferSizeY;
+            uint16_t WindowSizeX;
+            uint16_t WindowSizeY;
+            uint16_t WindowOriginX;
+            uint16_t WindowOriginY;
+            /*8 bytes unused data*/
+            uint32_t FontSize;
+            uint32_t FontFamily;
+            uint32_t FontWeight;
+            uint8_t FaceName[65];
+            uint32_t CursorSize;
+            uint32_t FullScreen;
+            uint32_t QuickEdit;
+            uint32_t InsertMode;
+            uint32_t AutoPosition;
+            uint32_t HistoryBufferSize;
+            uint32_t NumberOfHistoryBuffers;
+            uint32_t HistoryNoDup;
+            uint32_t ColorTable[16];
         };
         /*
             SHLLINK ExtraDataBlock - ConsoleFEDataBlock
         */
         struct _cshllink_extdatablk_consfdblk{
-            int dummy;
+            struct _cshllink_extdatablk_blk_info info;
+            uint32_t CodePage;
         };
         /*
             SHLLINK ExtraDataBlock - DarwinDataBlock
         */
         struct _cshllink_extdatablk_darwdblk{
-            int dummy;
+            struct _cshllink_extdatablk_blk_info info;
+            uint8_t DarwinDataAnsi[260];
+            uint8_t DarwinDataUnicode[520];
         };
         /*
             SHLLINK ExtraDataBlock - EnvironmentVariableDataBlock
         */
         struct _cshllink_extdatablk_envdblk{
-            int dummy;
+            struct _cshllink_extdatablk_blk_info info;
+            uint8_t TargetAnsi[260];
+            uint8_t TargetUnicode[520];
         };
         /*
             SHLLINK ExtraDataBlock - IconEnvironmentDataBlock
         */
         struct _cshllink_extdatablk_icoenvdblk{
-            int dummy;
+            struct _cshllink_extdatablk_blk_info info;
+            uint8_t TargetAnsi[260];
+            uint8_t TargetUnicode[520];
         };
         /*
             SHLLINK ExtraDataBlock - KnownFolderDataBlock
         */
         struct _cshllink_extdatablk_knownfdblk{
-            int dummy;
+            struct _cshllink_extdatablk_blk_info info;
+            uint8_t KnownFolderID[16];
+            uint32_t Offset;
         };
         /*
             SHLLINK ExtraDataBlock - PropertyStoreDataBlock
         */
         struct _cshllink_extdatablk_propsdblk{
-            int dummy;
+            struct _cshllink_extdatablk_blk_info info;
+            uint8_t *PropertyStore;
         };
         /*
             SHLLINK ExtraDataBlock - ShimDataBlock
         */
         struct _cshllink_extdatablk_shimblk{
-            int dummy;
+            struct _cshllink_extdatablk_blk_info info;
+            uint8_t *LayerName;
         };
         /*
             SHLLINK ExtraDataBlock - SpecialFolderDataBlock
         */
         struct _cshllink_extdatablk_specfdblk{
-            int dummy;
+            struct _cshllink_extdatablk_blk_info info;
+            uint32_t SpecialFolderID;
+            uint32_t Offset;
         };
         /*
             SHLLINK ExtraDataBlock - TrackerDataBlock
         */
         struct _cshllink_extdatablk_trackdblk{
-            int dummy;
+            struct _cshllink_extdatablk_blk_info info;
+            uint32_t Length;
+            uint32_t Version;
+            uint8_t MachineID[16];
+            uint8_t Droid[32];
+            uint8_t DroidBirth[32];
         };
         /*
             SHLLINK ExtraDataBlock - VistaAndAboveIDListDataBlock
         */
         struct _cshllink_extdatablk_viidldblk{
-            int dummy;
+            struct _cshllink_extdatablk_blk_info info;
+            struct _cshllink_lnktidl_idl cshllink_lnktidl_idl;
         };
     struct _cshllink_extdatablk{
         struct _cshllink_extdatablk_consdblk *ConsoleDataBlock;
@@ -222,7 +269,6 @@
         SHLLINK ExtraData
         */
         struct _cshllink_extdatablk cshllink_extdatablk;
-
     };
 
 #endif
