@@ -47,11 +47,11 @@
         
         /* A 32-bit unsigned integer that specifies the expected window state of an application launched by the link. This value SHOULD be one of the following
 
-        SW_SHOWNORMAL 0x00000001        The application is open and its window is open in a normal fashion.
-        SW_SHOWMAXIMIZED 0x00000003     The application is open, and keyboard focus is given to the application, but its window is not shown.
-        SW_SHOWMINNOACTIVE 0x00000007   The application is open, but its window is not shown. It is not given the keyboard focus
+            SW_SHOWNORMAL 0x00000001        The application is open and its window is open in a normal fashion.
+            SW_SHOWMAXIMIZED 0x00000003     The application is open, and keyboard focus is given to the application, but its window is not shown.
+            SW_SHOWMINNOACTIVE 0x00000007   The application is open, but its window is not shown. It is not given the keyboard focus
 
-        All other values MUST be treated as SW_SHOWNORMAL
+            All other values MUST be treated as SW_SHOWNORMAL
         */
         uint32_t ShowCommand;
 
@@ -353,17 +353,27 @@
 
         - specifies the target of the link. The presence of this structure is specified by the HasLinkTargetIDList bit (LinkFlags section 2.1.1) in the ShellLinkHeader
     */
+            /*
+                SHLLINK LinkTargetIDList - IDList - IDItem
+            */
+            struct _cshllink_lnktidl_idl_item{
+                // item size in bytes
+                uint16_t item_size;
+                uint8_t *item;
+            };
         /*
             SHLLINK LinkTargetIDList - IDList (terminated with TerminalBlock (2 Bytes NULL))
         */
         struct _cshllink_lnktidl_idl{
+            // num of elements
             uint8_t idl_inum;
-            uint8_t *idl;
+            struct _cshllink_lnktidl_idl_item *idl_item;
         };
     struct _cshllink_lnktidl{
         /*
             List of IDList elements
         */
+        // size in bytes = _cshllink_lnktidl_idl_item.item_size
         uint16_t idl_size;
         struct _cshllink_lnktidl_idl cshllink_lnktidl_idl;
     };
@@ -373,7 +383,7 @@
         - specifies information necessary to resolve the link target. The presence of this structure is specified by the HasLinkInfo bit (LinkFlags section 2.1.1) in the ShellLinkHeader
     */
         /*
-        SHLLINK LinkInfo - VolumeID
+            SHLLINK LinkInfo - VolumeID
         */
         struct _cshllink_lnkinfo_volid{
             uint32_t VolumeIDSize;
