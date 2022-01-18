@@ -2,6 +2,8 @@
     This library provides an interface for the MS Shell Link Binary File Format in C [MS-SHLLINK](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink/16cb4ca1-9339-4d0c-a68d-bf1d6cc0f943)
 
     
+    This library is completely based on [MS-SHLLINK](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink/16cb4ca1-9339-4d0c-a68d-bf1d6cc0f943)
+    The descriptions of the variables are taken directly from the official documentation.
 
     Author: Felix Kröhnert
     License: GNU GPL V3 (refer to LICENSE for more information)
@@ -11,6 +13,27 @@
 #define _CSHLLINK_H_
 
     #include <inttypes.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+
+    /*
+        error handling
+
+        0x00            NO ERROR
+        0x01            FILE CLOSED
+        0x02            FILE INPUT/OUTPUT ERROR
+        0x03            NULL pointer argument
+        0x04            WRONG HEADER SIZE
+        0x05            WRONG HEADER CLSID
+    */
+    extern uint8_t cshllink_error;
+    #define _CSHLLINK_ERR_FCL 0x01
+    #define _CSHLLINK_ERR_FIO 0x02
+    #define _CSHLLINK_ERR_NULLPA 0x03
+    #define _CSHLLINK_ERR_WHEADS 0x04
+    #define _CSHLLINK_ERR_WCLSIDS 0x05
+    #define _cshllink_errint(errorval) {cshllink_error=errorval; return -1;}
 
     /*
         SHLLINK Header
@@ -22,7 +45,8 @@
         uint32_t HeaderSize;
 
         // A class identifier (CLSID). This value MUST be 00021401-0000-0000-C000-000000000046
-        uint64_t LinkCLSID;
+        uint64_t LinkCLSID_L;
+        uint64_t LinkCLSID_H;
 
         // A LinkFlags structure (section 2.1.1) that specifies information about the shell link and the presence of optional portions of the structure
         uint32_t LinkFlags;
@@ -906,7 +930,7 @@
     /*
         SHLLINK Structure
     */
-    struct _cshllink {
+    typedef struct _cshllink{
 
         /*
             SHLLINK Header
@@ -928,6 +952,41 @@
         SHLLINK ExtraData
         */
         struct _cshllink_extdatablk cshllink_extdatablk;
-    };
+    }cshllink;
+
+    /*
+        Functions
+    */
+
+    
+    /*
+        -> open file descriptor of type FILE (R mode)
+        -> cshllink structure pointer containing the FILE content
+        -- reads content, modifies cshllink structure
+        <- on error this function will return -1 (the content of inputStruct is undefined), on success 0
+
+        exact error codes are stored in cshllink_error
+    */
+    uint8_t cshllink_loadFile(FILE *fp, cshllink *inputStruct);
+    
+    /*
+        Processes inputFile
+    */
+    uint8_t cshllink_loadFile_i(FILE *fp, cshllink *inputStruct);
+
+    /*
+        -> open file descriptor of type FILE (W mode)
+        -> cshllink structure pointer containing the FILE content
+        -- writes content to file
+        <- on error this function will return -1 (the content of inputStruct is undefined), on success 0
+
+        exact error codes are stored in cshllink_error
+    */
+    uint8_t cshllink_writeFile(FILE *fp, cshllink *inputStruct);
+
+    /*
+        Converts little Endian to big Endian and vice versa
+    */
+    void cshllink_sEndian(void *inp, size_t size);
 
 #endif
