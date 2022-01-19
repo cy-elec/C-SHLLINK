@@ -26,6 +26,20 @@
         0x03            NULL pointer argument
         0x04            WRONG HEADER SIZE
         0x05            WRONG HEADER CLSID
+        0x06            NULL pointer IDList
+        0x07            NULL pointer IDList Member
+        0x08            Invalid IDList
+        0x09            Invalid LinkInfoHeaderSize
+        0x0A            VIDSIZE too low
+        0x0B            NULL pointer VolumeID Data
+        0x0C            NULL pointer LocalBasePath
+        0x0D            NULL pointer CommonPathSuffix
+        0x0E            NULL pointer LocalBasePathUnicode
+        0x0F            NULL pointer CommonPathSuffixUnicode
+        0x10            NULL pointer NetName
+        0x11            NULL pointer DeviceName
+        0x12            NULL pointer NetNameUnicode
+        0x13            NULL pointer DeviceNameUnicode
     */
     extern uint8_t cshllink_error;
     #define _CSHLLINK_ERR_FCL 0x01
@@ -33,6 +47,20 @@
     #define _CSHLLINK_ERR_NULLPA 0x03
     #define _CSHLLINK_ERR_WHEADS 0x04
     #define _CSHLLINK_ERR_WCLSIDS 0x05
+    #define _CSHLLINK_ERR_NULLPIDL 0x06
+    #define _CSHLLINK_ERR_NULLPIDLM 0x07
+    #define _CSHLLINK_ERR_INVIDL 0x08
+    #define _CSHLLINK_ERR_INVLIHS 0x09
+    #define _CSHLLINK_ERR_VIDSLOW 0x0A
+    #define _CSHLLINK_ERR_NULLPVIDD 0x0B
+    #define _CSHLLINK_ERR_NULLPLBP 0x0C
+    #define _CSHLLINK_ERR_NULLPCPS 0x0D
+    #define _CSHLLINK_ERR_NULLPLBPU 0x0E
+    #define _CSHLLINK_ERR_NULLPCPSU 0x0F
+    #define _CSHLLINK_ERR_NULLPNETN 0x10
+    #define _CSHLLINK_ERR_NULLPDEVN 0x11
+    #define _CSHLLINK_ERR_NULLPNNU 0x12
+    #define _CSHLLINK_ERR_NULLPDNU 0x13
     #define _cshllink_errint(errorval) {cshllink_error=errorval; return -1;}
 
     /*
@@ -97,137 +125,137 @@
         LinkTargetIDList structure (section 2.2) MUST follow the ShellLinkHeader.
         If this bit is not set, this structure MUST NOT be present
     */
-    #define CSHLLINK_LF_HasLinkTargetIDList 1<<31
+    #define CSHLLINK_LF_HasLinkTargetIDList 1<<0
     /*
         The shell link is saved with link information. If this bit is set, a LinkInfo
         structure (section 2.3) MUST be present. If this bit is not set, this structure
         MUST NOT be present
     */
-    #define CSHLLINK_LF_HasLinkInfo 1<<30
+    #define CSHLLINK_LF_HasLinkInfo 1<<1
     /*
         The shell link is saved with a name string. If this bit is set, a
         NAME_STRING StringData structure (section 2.4) MUST be present. If
         this bit is not set, this structure MUST NOT be present
     */
-    #define CSHLLINK_LF_HasName 1<<29
+    #define CSHLLINK_LF_HasName 1<<2
     /*
         The shell link is saved with a relative path string. If this bit is set, a
         RELATIVE_PATH StringData structure (section 2.4) MUST be present. If
         this bit is not set, this structure MUST NOT be present
     */
-    #define CSHLLINK_LF_HasRelativePath 1<<28
+    #define CSHLLINK_LF_HasRelativePath 1<<3
     /*
         The shell link is saved with a working directory string. If this bit is set, a
         WORKING_DIR StringData structure (section 2.4) MUST be present. If
         this bit is not set, this structure MUST NOT be present
     */
-    #define CSHLLINK_LF_HasWorkingDir 1<<27
+    #define CSHLLINK_LF_HasWorkingDir 1<<4
     /*
         The shell link is saved with command line arguments. If this bit is set, a
         COMMAND_LINE_ARGUMENTS StringData structure (section 2.4) MUST
         be present. If this bit is not set, this structure MUST NOT be present
     */
-    #define CSHLLINK_LF_HasArguments 1<<26
+    #define CSHLLINK_LF_HasArguments 1<<5
     /*
         The shell link is saved with an icon location string. If this bit is set, an
         ICON_LOCATION StringData structure (section 2.4) MUST be present. If
         this bit is not set, this structure MUST NOT be present
     */
-    #define CSHLLINK_LF_HasIconLocation 1<<25
+    #define CSHLLINK_LF_HasIconLocation 1<<6
     /*
         The shell link contains Unicode encoded strings. This bit SHOULD be set. If
         this bit is set, the StringData section contains Unicode-encoded strings;
         otherwise, it contains strings that are encoded using the system default
         code page
     */
-    #define CSHLLINK_LF_IsUnicode 1<<24
+    #define CSHLLINK_LF_IsUnicode 1<<7
     /*
         The LinkInfo structure (section 2.3) is ignored
     */
-    #define CSHLLINK_LF_ForceNoLinkInfo 1<<23
+    #define CSHLLINK_LF_ForceNoLinkInfo 1<<8
     /*
         The shell link is saved with an
         EnvironmentVariableDataBlock (section 2.5.4)
     */
-    #define CSHLLINK_LF_HasExpString 1<<22
+    #define CSHLLINK_LF_HasExpString 1<<9
     /*
         The target is run in a separate virtual machine when launching a link
         target that is a 16-bit application
     */
-    #define CSHLLINK_LF_RunInSeparateProcess 1<<21
-    // unused 1<<20
+    #define CSHLLINK_LF_RunInSeparateProcess 1<<10
+    // unused 1<<11
     /*
         The shell link is saved with a DarwinDataBlock (section 2.5.3)
     */
-    #define CSHLLINK_LF_HasDarwinID 1<<19
+    #define CSHLLINK_LF_HasDarwinID 1<<12
     /*
         The application is run as a different user when the target of the shell link is
         activated
     */
-    #define CSHLLINK_LF_RunAsUser 1<<18
+    #define CSHLLINK_LF_RunAsUser 1<<13
     /*
         The shell link is saved with an IconEnvironmentDataBlock (section 2.5.5)
     */
-    #define CSHLLINK_LF_HasExpIcon 1<<17
+    #define CSHLLINK_LF_HasExpIcon 1<<14
     /*
         The file system location is represented in the shell namespace when the
         path to an item is parsed into an IDList
     */
-    #define CSHLLINK_LF_NoPidlAlias 1<<16
-    // unused 1<<15
+    #define CSHLLINK_LF_NoPidlAlias 1<<15
+    // unused 1<<16
     /*
         The shell link is saved with a ShimDataBlock (section 2.5.8)
     */
-    #define CSHLLINK_LF_RunWithShimLayer 1<<14
+    #define CSHLLINK_LF_RunWithShimLayer 1<<17
     /*
         The TrackerDataBlock (section 2.5.10) is ignored
     */
-    #define CSHLLINK_LF_ForceNoLinkTrack 1<<13
+    #define CSHLLINK_LF_ForceNoLinkTrack 1<<18
     /*
         The shell link attempts to collect target properties and store them in the
         PropertyStoreDataBlock (section 2.5.7) when the link target is set
     */
-    #define CSHLLINK_LF_EnableTargetMetadata 1<<13
+    #define CSHLLINK_LF_EnableTargetMetadata 1<<19
     /*
         The EnvironmentVariableDataBlock is ignored
     */
-    #define CSHLLINK_LF_DisableLinkPathTracking 1<<12
+    #define CSHLLINK_LF_DisableLinkPathTracking 1<<20
     /*
         The SpecialFolderDataBlock (section 2.5.9) and the KnownFolderDataBlock (section 2.5.6) are ignored when loading the shell
         link. If this bit is set, these extra data blocks SHOULD NOT be saved when
         saving the shell link
     */
-    #define CSHLLINK_LF_DisableKnownFolderTracking 1<<11
+    #define CSHLLINK_LF_DisableKnownFolderTracking 1<<21
     /*
         If the link has a KnownFolderDataBlock (section 2.5.6), the unaliased form
         of the known folder IDList SHOULD be used when translating the target
         IDList at the time that the link is loaded
     */
-    #define CSHLLINK_LF_DisableKnownFolderAlias 1<<10
+    #define CSHLLINK_LF_DisableKnownFolderAlias 1<<22
     /*
         Creating a link that references another link is enabled. Otherwise,
         specifying a link as the target IDList SHOULD NOT be allowed
     */
-    #define CSHLLINK_LF_AllowLinkToLink 1<<9
+    #define CSHLLINK_LF_AllowLinkToLink 1<<23
     /*
         When saving a link for which the target IDList is under a known folder,
         either the unaliased form of that known folder or the target IDList SHOULD
         be used
     */
-    #define CSHLLINK_LF_UnaliasOnSave 1<<8
+    #define CSHLLINK_LF_UnaliasOnSave 1<<24
     /*
         The target IDList SHOULD NOT be stored; instead, the path specified in the
         EnvironmentVariableDataBlock (section 2.5.4) SHOULD be used to refer to
         the target
     */
-    #define CSHLLINK_LF_PreferEnvironmentPath 1<<7
+    #define CSHLLINK_LF_PreferEnvironmentPath 1<<25
     /*
         When the target is a UNC name that refers to a location on a local
         machine, the local path IDList in the
         PropertyStoreDataBlock (section 2.5.7) SHOULD be stored, so it can be
         used when the link is loaded on the local machine
     */
-    #define CSHLLINK_LF_KeepLocalIDListForUNCTarget 1<<6
+    #define CSHLLINK_LF_KeepLocalIDListForUNCTarget 1<<26
     // 5 bits 0
 
     
@@ -237,69 +265,69 @@
         it. For a directory, if this bit is set, applications cannot delete
         the directory
     */
-    #define CSHLLINK_FA_READONLY 1<<31
+    #define CSHLLINK_FA_READONLY 1<<0
     /*
         The file or directory is read-only. For a file, if this bit is set,
         applications can read the file but cannot write to it or delete
         it. For a directory, if this bit is set, applications cannot delete
         the directory
     */
-    #define CSHLLINK_FA_HIDDEN 1<<30
+    #define CSHLLINK_FA_HIDDEN 1<<1
     /*
         The file or directory is part of the operating system or is used
         exclusively by the operating system
     */
-    #define CSHLLINK_FA_SYSTEM 1<<29
-    // reserved 1<<28 MUST be zero
+    #define CSHLLINK_FA_SYSTEM 1<<2
+    // reserved 1<<3 MUST be zero
     /*
         The link target is a directory instead of a file
     */
-    #define CSHLLINK_FA_DIRECTORY 1<<27
+    #define CSHLLINK_FA_DIRECTORY 1<<4
     /*
         The file or directory is an archive file. Applications use this
         flag to mark files for backup or removal
     */
-    #define CSHLLINK_FA_ARCHIVE 1<<26
-    // reserved 1<<25 MUST be zero
+    #define CSHLLINK_FA_ARCHIVE 1<<5
+    // reserved 1<<6 MUST be zero
     /*
         The file or directory has no other flags set. If this bit is 1, all
         other bits in this structure MUST be clear
     */
-    #define CSHLLINK_FA_NORMAL 1<<24
+    #define CSHLLINK_FA_NORMAL 1<<7
     /*
         The file is being used for temporary storage
     */
-    #define CSHLLINK_FA_TEMPORARY 1<<23
+    #define CSHLLINK_FA_TEMPORARY 1<<8
     /*
         The file is a sparse file
     */
-    #define CSHLLINK_FA_SPARSE_FILE 1<<22
+    #define CSHLLINK_FA_SPARSE_FILE 1<<9
     /*
         The file or directory has an associated reparse point
     */
-    #define CSHLLINK_FA_REPARSE_POINT 1<<21
+    #define CSHLLINK_FA_REPARSE_POINT 1<<10
     /*
         The file or directory is compressed. For a file, this means that
         all data in the file is compressed. For a directory, this means
         that compression is the default for newly created files and
         subdirectories
     */
-    #define CSHLLINK_FA_COMPRESSED 1<<20
+    #define CSHLLINK_FA_COMPRESSED 1<<11
     /*
         The data of the file is not immediately available
     */
-    #define CSHLLINK_FA_OFFLINE 1<<19
+    #define CSHLLINK_FA_OFFLINE 1<<12
     /*
         The contents of the file need to be indexed
     */
-    #define CSHLLINK_FA_NOT_CONTENT_INDEXED 1<<18
+    #define CSHLLINK_FA_NOT_CONTENT_INDEXED 1<<13
     /*
         The file or directory is encrypted. For a file, this means that
         all data in the file is encrypted. For a directory, this means
         that encryption is the default for newly created files and
         subdirectories
     */
-    #define CSHLLINK_FA_ENCRYPTED 1<<17
+    #define CSHLLINK_FA_ENCRYPTED 1<<14
     // 16 bit 0
 
 
@@ -401,7 +429,7 @@
         /*
             List of IDList elements
         */
-        // size in bytes = _cshllink_lnktidl_idl_item.item_size
+        // size in bytes = SUM(_cshllink_lnktidl_idl_item.item_size)
         uint16_t idl_size;
         // A stored IDList structure (section 2.2.1), which contains the item ID list
         struct _cshllink_lnktidl_idl cshllink_lnktidl_idl;
@@ -524,7 +552,7 @@
         is greater than or equal to 0x00000024, the value of the
         LocalBasePathOffsetUnicode field is zero
     */
-    #define CSHLLINK_LIF_VolumeIDAndLocalBasePath 1<<31
+    #define CSHLLINK_LIF_VolumeIDAndLocalBasePath 1<<0
     /*
         If set, the CommonNetworkRelativeLink field is present,
         and its location is specified by the value of the
@@ -533,7 +561,7 @@
         present, and the value of the
         CommonNetworkRelativeLinkOffset field is zero
     */
-    #define CSHLLINK_LIF_CommonNetworkRelativeLinkAndPathSuffix 1<<30
+    #define CSHLLINK_LIF_CommonNetworkRelativeLinkAndPathSuffix 1<<1
     // 30 bit 0
 
     #define CSHLLINK_VIDS_DRIVE_UNKNOWN       0x00000000       //The drive type cannot be determined.
@@ -550,13 +578,13 @@
         If not set, the DeviceNameOffset field does not contain an offset to the device name, and
         its value MUST be zero
     */
-    #define CSHLLINK_CNETRLNK_ValidDevice 1<<31
+    #define CSHLLINK_CNETRLNK_ValidDevice 1<<0
     /*
         If set, the NetProviderType field contains the network provider type.
         If not set, the NetProviderType field does not contain the network provider type, and its
         value MUST be zero
     */
-    #define CSHLLINK_CNETRLNK_ValidNetType 1<<30
+    #define CSHLLINK_CNETRLNK_ValidNetType 1<<1
     // 30 bit 0
 
     #define CSHLLINK_NPT_WNNC_NET_AVID          0x001A0000
@@ -988,5 +1016,15 @@
         Converts little Endian to big Endian and vice versa
     */
     void cshllink_sEndian(void *inp, size_t size);
+
+    /*
+        frees whole structure
+    */
+    void cshllink_free(cshllink *inputStruct);
+    
+    /*
+        read NULL terminated String
+    */
+    uint8_t cshllink_rNULLstr(char *dest, uint8_t errv1, uint8_t errv2, FILE *fp);
 
 #endif
