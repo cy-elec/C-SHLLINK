@@ -25,6 +25,7 @@
 
         exact error codes are stored in cshllink_error
     */
+    #pragma region loadFile
     uint8_t cshllink_loadFile(FILE *fp, cshllink *inputStruct) {
 
         // test if FILE is open
@@ -494,13 +495,100 @@
             _cshllink_errint(_CSHLLINK_DUPEEX_ConsoleDataBlock);
 
         if(info.BlockSize!=_CSHLLINK_EDBLK_ConsoleDataBlockSiz)
-            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
         input->cshllink_extdatablk.ConsoleDataBlock.info.BlockSize=info.BlockSize;
 
-        uint8_t *buf = malloc(_CSHLLINK_EDBLK_ConsoleDataBlockSiz-8);
-        if(fread(&buf, 1, _CSHLLINK_EDBLK_ConsoleDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_ConsoleDataBlockSiz-8)
+        //FillAttributes
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.FillAttributes, 2, 1, fp)!=1)
             _cshllink_errint(_CSHLLINK_ERR_FIO);
-        free(buf);
+
+        //PopupFillAttributes
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.PopupFillAttributes, 2, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //ScreenBufferSizeX
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.ScreenBufferSizeX, 2, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //ScreenBufferSizeY
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.ScreenBufferSizeY, 2, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        
+        //WindowSizeX
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.WindowSizeX, 2, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        
+        //WindowSizeY
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.WindowSizeY, 2, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //WindowOriginX
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.WindowOriginX, 2, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //WindowOriginY
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.WindowOriginY, 2, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+    
+        fseek(fp, 8, SEEK_CUR);
+
+        //FontSize
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.FontSize, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+    
+        //FontFamily
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.FontFamily, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //FontWeight
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.FontWeight, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //FaceName
+        if(cshllink_rwstr(&input->cshllink_extdatablk.ConsoleDataBlock.FaceName, _CSHLLINK_ERRX_NULLPSTRFNAME, _CSHLLINK_ERR_FIO, fp, 32))
+            return -1;
+
+        //CursorSize
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.CursorSize, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //FullScreen
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.FullScreen, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        
+        //QuickEdit
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.QuickEdit, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //InsertMode
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.InsertMode, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //AutoPosition
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.AutoPosition, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //HistoryBufferSize
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.HistoryBufferSize, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //NumberOfHistoryBuffers
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.NumberOfHistoryBuffers, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //HistoryNoDup
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.HistoryNoDup, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+        //AutoPosition
+        if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.AutoPosition, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+       
+        //ColorTable
+        for(int i=0; i<16; i++)
+            if(fread(&input->cshllink_extdatablk.ConsoleDataBlock.ColorTable[i], 4, 1, fp)!=1)
+                _cshllink_errint(_CSHLLINK_ERR_FIO);
+
         return 0;
     }
 
@@ -509,13 +597,13 @@
             _cshllink_errint(_CSHLLINK_DUPEEX_ConsoleFEDataBlock);
         
         if(info.BlockSize!=_CSHLLINK_EDBLK_ConsoleFEDataBlockSiz)
-            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
         input->cshllink_extdatablk.ConsoleFEDataBlock.info.BlockSize=info.BlockSize;
 
-        uint8_t *buf = malloc(_CSHLLINK_EDBLK_ConsoleFEDataBlockSiz-8);
-        if(fread(&buf, 1, _CSHLLINK_EDBLK_ConsoleFEDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_ConsoleFEDataBlockSiz-8)
+        //CodePage
+        if(fread(&input->cshllink_extdatablk.ConsoleFEDataBlock.CodePage, 4, 1, fp)!=1)
             _cshllink_errint(_CSHLLINK_ERR_FIO);
-        free(buf);
+
         return 0;
     }
 
@@ -524,13 +612,17 @@
             _cshllink_errint(_CSHLLINK_DUPEEX_DarwinDataBlock);
         
         if(info.BlockSize!=_CSHLLINK_EDBLK_DarwinDataBlockSiz)
-            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
         input->cshllink_extdatablk.DarwinDataBlock.info.BlockSize=info.BlockSize;
 
-        uint8_t *buf = malloc(_CSHLLINK_EDBLK_DarwinDataBlockSiz-8);
-        if(fread(&buf, 1, _CSHLLINK_EDBLK_DarwinDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_DarwinDataBlockSiz-8)
-            _cshllink_errint(_CSHLLINK_ERR_FIO);
-        free(buf);
+        //DarwinDataAnsi
+        if(cshllink_rstr(&input->cshllink_extdatablk.DarwinDataBlock.DarwinDataAnsi, _CSHLLINK_ERRX_NULLPSTRDARDA, _CSHLLINK_ERR_FIO, fp, 260))
+            return -1;
+        
+        //DarwinDataUnicode
+        if(cshllink_rwstr(&input->cshllink_extdatablk.DarwinDataBlock.DarwinDataUnicode, _CSHLLINK_ERRX_NULLPSTRDARDU, _CSHLLINK_ERR_FIO, fp, 520))
+            return -1;
+
         return 0;
     }
 
@@ -539,13 +631,17 @@
             _cshllink_errint(_CSHLLINK_DUPEEX_EnvironmentVariableDataBlock);
         
         if(info.BlockSize!=_CSHLLINK_EDBLK_EnvironmentVariableDataBlockSiz)
-            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
         input->cshllink_extdatablk.EnvironmentVariableDataBlock.info.BlockSize=info.BlockSize;
 
-        uint8_t *buf = malloc(_CSHLLINK_EDBLK_EnvironmentVariableDataBlockSiz-8);
-        if(fread(&buf, 1, _CSHLLINK_EDBLK_EnvironmentVariableDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_EnvironmentVariableDataBlockSiz-8)
-            _cshllink_errint(_CSHLLINK_ERR_FIO);
-        free(buf);
+        //EnvironmentVariableDataAnsi
+        if(cshllink_rstr(&input->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetAnsi, _CSHLLINK_ERRX_NULLPSTRENVDA, _CSHLLINK_ERR_FIO, fp, 260))
+            return -1;
+        
+        //EnvironmentVariableDataUnicode
+        if(cshllink_rwstr(&input->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetUnicode, _CSHLLINK_ERRX_NULLPSTRENVDU, _CSHLLINK_ERR_FIO, fp, 520))
+            return -1;
+
         return 0;
     }
 
@@ -554,13 +650,17 @@
             _cshllink_errint(_CSHLLINK_DUPEEX_IconEnvironmentDataBlock);
         
         if(info.BlockSize!=_CSHLLINK_EDBLK_IconEnvironmentDataBlockSiz)
-            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
         input->cshllink_extdatablk.IconEnvironmentDataBlock.info.BlockSize=info.BlockSize;
+        
+        //IconEnvironmentDataAnsi
+        if(cshllink_rstr(&input->cshllink_extdatablk.IconEnvironmentDataBlock.TargetAnsi, _CSHLLINK_ERRX_NULLPSTRIENVDA, _CSHLLINK_ERR_FIO, fp, 260))
+            return -1;
 
-        uint8_t *buf = malloc(_CSHLLINK_EDBLK_IconEnvironmentDataBlockSiz-8);
-        if(fread(&buf, 1, _CSHLLINK_EDBLK_IconEnvironmentDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_IconEnvironmentDataBlockSiz-8)
-            _cshllink_errint(_CSHLLINK_ERR_FIO);
-        free(buf);
+        //IconEnvironmentDataUnicode
+        if(cshllink_rwstr(&input->cshllink_extdatablk.IconEnvironmentDataBlock.TargetUnicode, _CSHLLINK_ERRX_NULLPSTRIENVDU, _CSHLLINK_ERR_FIO, fp, 520))
+            return -1;
+
         return 0;
     }
 
@@ -569,13 +669,17 @@
             _cshllink_errint(_CSHLLINK_DUPEEX_KnownFolderDataBlock);
         
         if(info.BlockSize!=_CSHLLINK_EDBLK_KnownFolderDataBlockSiz)
-            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
         input->cshllink_extdatablk.KnownFolderDataBlock.info.BlockSize=info.BlockSize;
 
-        uint8_t *buf = malloc(_CSHLLINK_EDBLK_KnownFolderDataBlockSiz-8);
-        if(fread(&buf, 1, _CSHLLINK_EDBLK_KnownFolderDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_KnownFolderDataBlockSiz-8)
+        //KnownFolderID
+        if(cshllink_rstr((char **)&input->cshllink_extdatablk.KnownFolderDataBlock.KnownFolderID, _CSHLLINK_ERR_NULLPEXTD, _CSHLLINK_ERR_FIO, fp, 16))
+            return -1;
+        
+        //Offset
+        if(fread(&input->cshllink_extdatablk.KnownFolderDataBlock.Offset, 4, 1, fp)!=1)
             _cshllink_errint(_CSHLLINK_ERR_FIO);
-        free(buf);
+
         return 0;
     }
 
@@ -584,13 +688,13 @@
             _cshllink_errint(_CSHLLINK_DUPEEX_PropertyStoreDataBlock);
         
         if(info.BlockSize!=_CSHLLINK_EDBLK_PropertyStoreDataBlockSiz)
-            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
         input->cshllink_extdatablk.PropertyStoreDataBlock.info.BlockSize=info.BlockSize;
 
-        uint8_t *buf = malloc(_CSHLLINK_EDBLK_ShimDataBlockSiz-8);
-        if(fread(&buf, 1, _CSHLLINK_EDBLK_ShimDataBlockSiz-4, fp)!=_CSHLLINK_EDBLK_ShimDataBlockSiz-8)
-            _cshllink_errint(_CSHLLINK_ERR_FIO);
-        free(buf);
+        //PropertyStore
+        if(cshllink_rstr((char **)&input->cshllink_extdatablk.KnownFolderDataBlock.KnownFolderID, _CSHLLINK_ERR_NULLPEXTD, _CSHLLINK_ERR_FIO, fp, input->cshllink_extdatablk.PropertyStoreDataBlock.info.BlockSize-8))
+            return -1;
+
         return 0;
     }
 
@@ -599,13 +703,13 @@
             _cshllink_errint(_CSHLLINK_DUPEEX_ShimDataBlock);
         
         if(info.BlockSize!=_CSHLLINK_EDBLK_ShimDataBlockSiz)
-            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
         input->cshllink_extdatablk.ShimDataBlock.info.BlockSize=info.BlockSize;
 
-        uint8_t *buf = malloc(_CSHLLINK_EDBLK_ShimDataBlockSiz-8);
-        if(fread(&buf, 1, _CSHLLINK_EDBLK_ShimDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_ShimDataBlockSiz-8)
-            _cshllink_errint(_CSHLLINK_ERR_FIO);
-        free(buf);
+        //LayerName
+        if(cshllink_rwstr(&input->cshllink_extdatablk.ShimDataBlock.LayerName, _CSHLLINK_ERR_NULLPEXTD, _CSHLLINK_ERR_FIO, fp, input->cshllink_extdatablk.ShimDataBlock.info.BlockSize-8))
+            return -1;
+
         return 0;
     }
 
@@ -614,13 +718,17 @@
             _cshllink_errint(_CSHLLINK_DUPEEX_SpecialFolderDataBlock);
         
         if(info.BlockSize!=_CSHLLINK_EDBLK_SpecialFolderDataBlockSiz)
-            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
         input->cshllink_extdatablk.SpecialFolderDataBlock.info.BlockSize=info.BlockSize;
 
-        uint8_t *buf = malloc(_CSHLLINK_EDBLK_SpecialFolderDataBlockSiz-8);
-        if(fread(&buf, 1, _CSHLLINK_EDBLK_SpecialFolderDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_SpecialFolderDataBlockSiz-8)
+        //SpecialFolderID
+        if(fread(&input->cshllink_extdatablk.SpecialFolderDataBlock.SpecialFolderID, 4, 1, fp)!=1)
             _cshllink_errint(_CSHLLINK_ERR_FIO);
-        free(buf);
+
+        //Offset
+        if(fread(&input->cshllink_extdatablk.SpecialFolderDataBlock.Offset, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+
         return 0;
     }
 
@@ -631,13 +739,33 @@
         printf("0x%lx:\t0x%x -- 0x%x\n", ftell(fp), info.BlockSize, _CSHLLINK_EDBLK_TrackerDataBlockSiz);
 
         if(info.BlockSize!=_CSHLLINK_EDBLK_TrackerDataBlockSiz)
-            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
         input->cshllink_extdatablk.TrackerDataBlock.info.BlockSize=info.BlockSize;
 
-        char *buf = malloc(_CSHLLINK_EDBLK_TrackerDataBlockSiz-8);
-        if(fread(buf, 1, _CSHLLINK_EDBLK_TrackerDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_TrackerDataBlockSiz-8)
+        //Length
+        if(fread(&input->cshllink_extdatablk.TrackerDataBlock.Length, 4, 1, fp)!=1)
             _cshllink_errint(_CSHLLINK_ERR_FIO);
-        free(buf);
+        if(input->cshllink_extdatablk.TrackerDataBlock.Length!=_CSHLLINK_EDBLK_TrackerDataBlockLen)
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
+
+        //Version
+        if(fread(&input->cshllink_extdatablk.TrackerDataBlock.Length, 4, 1, fp)!=1)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        if(input->cshllink_extdatablk.TrackerDataBlock.Length!=0)
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGVERSION);
+        
+        //MachineID
+        if(cshllink_rstr(&input->cshllink_extdatablk.TrackerDataBlock.MachineID, _CSHLLINK_ERR_NULLPEXTD, _CSHLLINK_ERR_FIO, fp, 16))
+            return -1;
+
+        //Droid
+        if(cshllink_rstr((char **)&input->cshllink_extdatablk.TrackerDataBlock.Droid, _CSHLLINK_ERR_NULLPEXTD, _CSHLLINK_ERR_FIO, fp, 32))
+            return -1;
+
+        //DroidBirth
+        if(cshllink_rstr((char **)&input->cshllink_extdatablk.TrackerDataBlock.DroidBirth, _CSHLLINK_ERR_NULLPEXTD, _CSHLLINK_ERR_FIO, fp, 32))
+            return -1;
+
         return 0;
     }
 
@@ -646,13 +774,35 @@
             _cshllink_errint(_CSHLLINK_DUPEEX_VistaAndAboveIDListDataBlock);
         
         if(info.BlockSize!=_CSHLLINK_EDBLK_VistaAndAboveIDListDataBlockSiz)
-            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+            _cshllink_errint(_CSHLLINK_ERRX_WRONGSIZE);
         input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.info.BlockSize=info.BlockSize;
 
-        uint8_t *buf = malloc(_CSHLLINK_EDBLK_VistaAndAboveIDListDataBlockSiz-8);
-        if(fread(&buf, 1, _CSHLLINK_EDBLK_VistaAndAboveIDListDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_VistaAndAboveIDListDataBlockSiz-8)
+        int tmpS=input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.info.BlockSize=info.BlockSize-10;
+        while(tmpS>0) {
+            //realloc element
+            input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_item = realloc(input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_item, input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_inum+1);
+            if(input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_item==NULL) 
+                _cshllink_errint(_CSHLLINK_ERR_NULLPIDL);
+            //Element size
+            if(fread(&input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_item[input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_inum].item_size, 2, 1, fp) != 1)
+                _cshllink_errint(_CSHLLINK_ERR_FIO);
+            //Element (size -2 as struct contains one 2byte var)
+            input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_item[input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_inum].item = malloc(input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_item[input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_inum].item_size-2);
+            if(input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_item[input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_inum].item==NULL)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPIDLM);
+            if(fread(&input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_item[input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_inum].item, input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_item[input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_inum].item_size-2, 1, fp) != 1)
+                _cshllink_errint(_CSHLLINK_ERR_FIO);
+            
+            tmpS-=input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_item[input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_inum].item_size;
+            input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.cshllink_lnktidl_idl.idl_inum++;
+        }
+        uint16_t nullb;
+        if(fread(&nullb, 2, 1, fp)!=1)
             _cshllink_errint(_CSHLLINK_ERR_FIO);
-        free(buf);
+        if(tmpS<0||nullb!=0)
+            _cshllink_errint(_CSHLLINK_ERR_INVIDL);  
+
         return 0;
     }
 
+    #pragma endregion

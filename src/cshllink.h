@@ -59,6 +59,15 @@
         0x23            ExtraDataBlock TrackerDataBlock duplicate
         0x24            ExtraDataBlock VistaAndAboveIDListDataBlock duplicate
         0x25            ExtraDataBlock Incorrect Block Size
+        0x26            ExtraDataBlock Wrong Version
+        0x27            NULL pointer ExtraDataBlock
+        0x28            NULL pointer ExtraDataBlock FaceName
+        0x29            NULL pointer ExtraDataBlock DarwinDataAnsi
+        0x2A            NULL pointer ExtraDataBlock DarwinDataUnicode
+        0x2B            NULL pointer ExtraDataBlock EnvironmentVariableDataAnsi
+        0x2C            NULL pointer ExtraDataBlock EnvironmentVariableDataUnicode
+        0x2D            NULL pointer ExtraDataBlock IconEnvironmentDataAnsi
+        0x2E            NULL pointer ExtraDataBlock IconEnvironmentDataUnicode
     */
     extern uint8_t cshllink_error;
     #define _CSHLLINK_ERR_FCL 0x01
@@ -97,7 +106,16 @@
     #define _CSHLLINK_DUPEEX_SpecialFolderDataBlock 0x22
     #define _CSHLLINK_DUPEEX_TrackerDataBlock 0x23
     #define _CSHLLINK_DUPEEX_VistaAndAboveIDListDataBlock 0x24
-    #define _CSHLLINK_DUPEEX_WRONGSIZE 0x25
+    #define _CSHLLINK_ERRX_WRONGSIZE 0x25
+    #define _CSHLLINK_ERRX_WRONGVERSION 0x26
+    #define _CSHLLINK_ERR_NULLPEXTD 0x27
+    #define _CSHLLINK_ERRX_NULLPSTRFNAME 0x28
+    #define _CSHLLINK_ERRX_NULLPSTRDARDA 0x29
+    #define _CSHLLINK_ERRX_NULLPSTRDARDU 0x2A
+    #define _CSHLLINK_ERRX_NULLPSTRENVDA 0x2B
+    #define _CSHLLINK_ERRX_NULLPSTRENVDU 0x2C
+    #define _CSHLLINK_ERRX_NULLPSTRIENVDA 0x2D
+    #define _CSHLLINK_ERRX_NULLPSTRIENVDU 0x2E
     #define _cshllink_errint(errorval) {cshllink_error=errorval; return -1;}
 
     /*
@@ -770,7 +788,7 @@
             */
             uint32_t FontWeight;
             // A 32-character Unicode string that specifies the face name of the font used in the console window
-            char FaceName[65];
+            char16_t *FaceName;
             // A 32-bit, unsigned integer that specifies the size of the cursor, in pixels, used in the console window
             /*
                 value ≤ 25      A small cursor.
@@ -863,10 +881,10 @@
             // BlockSize MUST be 0x00000314
             // BlockSignature MUST be 0xA0000006
             struct _cshllink_extdatablk_blk_info info;
-            // A NULL–terminated string, defined by the system default code page, which specifies an application identifier. This field SHOULD be ignored
-            char DarwinDataAnsi[260];
-            // An optional, NULL–terminated, Unicode string that specifies an application identifier (In Windows, this is a Windows Installer (MSI) application descriptor. For more information, see [MSDN-MSISHORTCUTS])
-            char DarwinDataUnicode[520];
+            // A NULL–terminated string, defined by the system default code page, which specifies an application identifier. This field SHOULD be ignored (260b)
+            char *DarwinDataAnsi;
+            // An optional, NULL–terminated, Unicode string that specifies an application identifier (In Windows, this is a Windows Installer (MSI) application descriptor. For more information, see [MSDN-MSISHORTCUTS]) (520b)
+            char16_t *DarwinDataUnicode;
         };
         /*
             SHLLINK ExtraDataBlock - EnvironmentVariableDataBlock
@@ -879,10 +897,10 @@
             // BlockSize MUST be 0x00000314
             // BlockSignature MUST be 0xA0000001
             struct _cshllink_extdatablk_blk_info info;
-            // A NULL-terminated string, defined by the system default code page, which specifies a path to environment variable information
-            char TargetAnsi[260];
-            // An optional, NULL-terminated, Unicode string that specifies a path to environment variable information
-            char TargetUnicode[520];
+            // A NULL-terminated string, defined by the system default code page, which specifies a path to environment variable information (260b)
+            char *TargetAnsi;
+            // An optional, NULL-terminated, Unicode string that specifies a path to environment variable information (520)
+            char16_t *TargetUnicode;
         };
         /*
             SHLLINK ExtraDataBlock - IconEnvironmentDataBlock
@@ -896,9 +914,9 @@
             // BlockSignature MUST be 0xA0000007
             struct _cshllink_extdatablk_blk_info info;
             // A NULL-terminated string, defined by the system default code page, which specifies a path that is constructed with environment variables
-            char TargetAnsi[260];
+            char *TargetAnsi;
             // An optional, NULL-terminated, Unicode string that specifies a path that is constructed with environment variables
-            char TargetUnicode[520];
+            char16_t *TargetUnicode;
         };
         /*
             SHLLINK ExtraDataBlock - KnownFolderDataBlock
@@ -912,7 +930,7 @@
             // BlockSignature MUST be 0xA000000B
             struct _cshllink_extdatablk_blk_info info;
             // A value in GUID packet representation ([MS-DTYP] section 2.3.4.2) that specifies the folder GUID ID
-            uint8_t KnownFolderID[16];
+            uint8_t *KnownFolderID;
             // A 32-bit, unsigned integer that specifies the location of the ItemID of the first child segment of the IDList specified by KnownFolderID. This value is the offset, in bytes, into the link target IDList
             uint32_t Offset;
         };
@@ -942,7 +960,7 @@
             // BlockSignature MUST be 0xA0000008
             struct _cshllink_extdatablk_blk_info info;
             // A Unicode string that specifies the name of a shim layer to apply to a link target when it is being activated
-            char *LayerName;
+            char16_t *LayerName;
         };
         /*
             SHLLINK ExtraDataBlock - SpecialFolderDataBlock
@@ -967,6 +985,7 @@
         */
         #define _CSHLLINK_EDBLK_TrackerDataBlockSiz 0x00000060
         #define _CSHLLINK_EDBLK_TrackerDataBlockSig 0xA0000003
+        #define _CSHLLINK_EDBLK_TrackerDataBlockLen 0x00000058
         struct _cshllink_extdatablk_trackdblk{
             // BlockSize MUST be 0x00000060
             // BlockSignature MUST be 0xA0000003
@@ -976,11 +995,11 @@
             // A 32-bit, unsigned integer. This value MUST be 0x00000000
             uint32_t Version;
             // A NULL–terminated character string, as defined by the system default code page, which specifies the NetBIOS name of the machine where the link target was last known to reside
-            char MachineID[16];
+            char *MachineID;
             // Two values in GUID packet representation ([MS-DTYP] section 2.3.4.2) that are used to find the link target with the Link Tracking service, as described in [MS-DLTW]
-            uint8_t Droid[32];
+            uint8_t *Droid;
             // Two values in GUID packet representation that are used to find the link target with the Link Tracking service
-            uint8_t DroidBirth[32];
+            uint8_t *DroidBirth;
         };
         /*
             SHLLINK ExtraDataBlock - VistaAndAboveIDListDataBlock
@@ -1076,11 +1095,6 @@
         Converts little Endian to big Endian and vice versa
     */
     void cshllink_sEndian(void *inp, size_t size);
-
-    /*
-        frees whole structure
-    */
-    void cshllink_free(cshllink *inputStruct);
     
     /*
         read NULL terminated String
@@ -1108,5 +1122,10 @@
     uint8_t _cshllink_readESpecialFolderDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
     uint8_t _cshllink_readETrackerDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
     uint8_t _cshllink_readEVistaAndAboveIDListDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    
+    /*
+        frees whole structure
+    */
+    void cshllink_free(cshllink *inputStruct);
 
 #endif
