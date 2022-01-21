@@ -806,3 +806,36 @@
     }
 
     #pragma endregion
+
+    #pragma region util
+
+    /*
+        frees whole structure
+    */
+    void cshllink_free(cshllink *inputStruct) {      
+        free(inputStruct->cshllink_extdatablk.ConsoleDataBlock.FaceName);
+        free(inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataAnsi);
+        free(inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataUnicode);
+        free(inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetAnsi);
+        free(inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetUnicode);
+        free(inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetAnsi);
+        free(inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetUnicode);
+        free(inputStruct->cshllink_extdatablk.KnownFolderDataBlock.KnownFolderID);
+        free(inputStruct->cshllink_extdatablk.PropertyStoreDataBlock.PropertyStore);
+        free(inputStruct->cshllink_extdatablk.ShimDataBlock.LayerName);
+        free(inputStruct->cshllink_extdatablk.TrackerDataBlock.Droid);
+        free(inputStruct->cshllink_extdatablk.TrackerDataBlock.DroidBirth);
+        free(inputStruct->cshllink_extdatablk.TrackerDataBlock.MachineID);
+        free(inputStruct->cshllink_lnkinfo.CommonPathSuffix);
+        free(inputStruct->cshllink_lnkinfo.CommonPathSuffixUnicode);
+        free(inputStruct->cshllink_lnkinfo.LocalBasePath);
+        free(inputStruct->cshllink_lnkinfo.LocalBasePathUnicode);
+        free(inputStruct->cshllink_lnktidl.cshllink_lnktidl_idl.idl_item);
+        free(inputStruct->cshllink_strdata.CommandLineArguments.UString);
+        free(inputStruct->cshllink_strdata.IconLocation.UString);
+        free(inputStruct->cshllink_strdata.NameString.UString);
+        free(inputStruct->cshllink_strdata.RelativePath.UString);
+        free(inputStruct->cshllink_strdata.WorkingDir.UString);
+    }
+
+    #pragma endregion
