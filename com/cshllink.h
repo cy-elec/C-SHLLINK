@@ -16,6 +16,7 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
+    typedef uint_least16_t char16_t;
 
     /*
         error handling
@@ -40,6 +41,24 @@
         0x11            NULL pointer DeviceName
         0x12            NULL pointer NetNameUnicode
         0x13            NULL pointer DeviceNameUnicode
+        0x14            NULL pointer NameString
+        0x15            NULL pointer RelativePath
+        0x16            NULL pointer WorkingDir
+        0x17            NULL pointer CommandLineArguments
+        0x18            NULL pointer IconLocation
+        0x19            Unknown ExtraDataBlock Signature
+        0x1A            ExtraDataBlock ConsoleDataBlock duplicate
+        0x1B            ExtraDataBlock ConsoleFEDataBlock duplicate
+        0x1C            ExtraDataBlock DarwinDataBlock duplicate
+        0x1D            ExtraDataBlock EnvironmentVariableDataBlock duplicate
+        0x1E            ExtraDataBlock IconEnvironmentDataBlock duplicate
+        0x1F            ExtraDataBlock KnownFolderDataBlock duplicate
+        0x20            ExtraDataBlock PropertyStoreDataBlock duplicate
+        0x21            ExtraDataBlock ShimDataBlock duplicate
+        0x22            ExtraDataBlock SpecialFolderDataBlock duplicate
+        0x23            ExtraDataBlock TrackerDataBlock duplicate
+        0x24            ExtraDataBlock VistaAndAboveIDListDataBlock duplicate
+        0x25            ExtraDataBlock Incorrect Block Size
     */
     extern uint8_t cshllink_error;
     #define _CSHLLINK_ERR_FCL 0x01
@@ -61,6 +80,24 @@
     #define _CSHLLINK_ERR_NULLPDEVN 0x11
     #define _CSHLLINK_ERR_NULLPNNU 0x12
     #define _CSHLLINK_ERR_NULLPDNU 0x13
+    #define _CSHLLINK_ERR_NULLPSTRDNAME 0x14
+    #define _CSHLLINK_ERR_NULLPSTRDRPATH 0x15
+    #define _CSHLLINK_ERR_NULLPSTRDWDIR 0x16
+    #define _CSHLLINK_ERR_NULLPSTRDARG 0x17
+    #define _CSHLLINK_ERR_NULLPSTRDICO 0x18
+    #define _CSHLLINK_ERR_UNKEDBSIG 0x19
+    #define _CSHLLINK_DUPEEX_ConsoleDataBlock 0x1A
+    #define _CSHLLINK_DUPEEX_ConsoleFEDataBlock 0x1B
+    #define _CSHLLINK_DUPEEX_DarwinDataBlock 0x1C
+    #define _CSHLLINK_DUPEEX_EnvironmentVariableDataBlock 0x1D
+    #define _CSHLLINK_DUPEEX_IconEnvironmentDataBlock 0x1E
+    #define _CSHLLINK_DUPEEX_KnownFolderDataBlock 0x1F
+    #define _CSHLLINK_DUPEEX_PropertyStoreDataBlock 0x20
+    #define _CSHLLINK_DUPEEX_ShimDataBlock 0x21
+    #define _CSHLLINK_DUPEEX_SpecialFolderDataBlock 0x22
+    #define _CSHLLINK_DUPEEX_TrackerDataBlock 0x23
+    #define _CSHLLINK_DUPEEX_VistaAndAboveIDListDataBlock 0x24
+    #define _CSHLLINK_DUPEEX_WRONGSIZE 0x25
     #define _cshllink_errint(errorval) {cshllink_error=errorval; return -1;}
 
     /*
@@ -639,10 +676,10 @@
            // A 16-bit, unsigned integer that specifies either the number of characters, defined by the system default code page, or the number of Unicode characters found in the String field. A value of zero specifies an empty string
            uint16_t CountCharacters;
            // An optional set of characters, defined by the system default code page, or a Unicode string with a length specified by the CountCharacters field. This string MUST NOT be NULL-terminated
-           char *String;
+           char16_t *UString;
        };
     struct _cshllink_strdata{
-        // An optional structure that specifies a description of the shortcut that is displayed to end users to identify the purpose of the shell link. This structure MUST be present if the HasName flag is set
+        // REFERED TO AS "Comment". An optional structure that specifies a description of the shortcut that is displayed to end users to identify the purpose of the shell link. This structure MUST be present if the HasName flag is set
         struct _cshllink_strdata_def NameString;
         // An optional structure that specifies the location of the link target relative to the file that contains the shell link. When specified, this string SHOULD be used when resolving the link. This structure MUST be present if the HasRelativePath flag is set
         struct _cshllink_strdata_def RelativePath;
@@ -666,6 +703,8 @@
             - specifies the display settings to use when a link target specifies an application that is run in a console window (In Windows environments, this is commonly known as a "command prompt" window)
 
         */
+        #define _CSHLLINK_EDBLK_ConsoleDataBlockSiz 0x000000CC
+        #define _CSHLLINK_EDBLK_ConsoleDataBlockSig 0xA0000002
         struct _cshllink_extdatablk_consdblk{
             // BlockSize MUST be 0x000000CC
             // BlockSignature MUST be 0xA0000002
@@ -804,6 +843,8 @@
 
             - The ConsoleFEDataBlock structure specifies the code page to use for displaying text when a link target specifies an application that is run in a console window
         */
+        #define _CSHLLINK_EDBLK_ConsoleFEDataBlockSiz 0x0000000C
+        #define _CSHLLINK_EDBLK_ConsoleFEDataBlockSig 0xA0000004
         struct _cshllink_extdatablk_consfdblk{
             // BlockSize MUST be 0x0000000C
             // BlockSignature MUST be 0xA0000004
@@ -816,6 +857,8 @@
 
             - The DarwinDataBlock structure specifies an application identifier that can be used instead of a link target IDList to install an application when a shell link is activated
         */
+        #define _CSHLLINK_EDBLK_DarwinDataBlockSiz 0x00000314
+        #define _CSHLLINK_EDBLK_DarwinDataBlockSig 0xA0000006
         struct _cshllink_extdatablk_darwdblk{
             // BlockSize MUST be 0x00000314
             // BlockSignature MUST be 0xA0000006
@@ -830,6 +873,8 @@
 
             - The EnvironmentVariableDataBlock structure specifies a path to environment variable information when the link target refers to a location that has a corresponding environment variable
         */
+        #define _CSHLLINK_EDBLK_EnvironmentVariableDataBlockSiz 0x00000314
+        #define _CSHLLINK_EDBLK_EnvironmentVariableDataBlockSig 0xA0000001
         struct _cshllink_extdatablk_envdblk{
             // BlockSize MUST be 0x00000314
             // BlockSignature MUST be 0xA0000001
@@ -844,6 +889,8 @@
 
             - The IconEnvironmentDataBlock structure specifies the path to an icon. The path is encoded using environment variables, which makes it possible to find the icon across machines where the locations vary but are expressed using environment variables
         */
+        #define _CSHLLINK_EDBLK_IconEnvironmentDataBlockSiz 0x00000314
+        #define _CSHLLINK_EDBLK_IconEnvironmentDataBlockSig 0xA0000007
         struct _cshllink_extdatablk_icoenvdblk{
             // BlockSize MUST be 0x00000314
             // BlockSignature MUST be 0xA0000007
@@ -858,6 +905,8 @@
 
             - The KnownFolderDataBlock structure specifies the location of a known folder. This data can be used when a link target is a known folder to keep track of the folder so that the link target IDList can be translated when the link is loaded
         */
+        #define _CSHLLINK_EDBLK_KnownFolderDataBlockSiz 0x0000001C
+        #define _CSHLLINK_EDBLK_KnownFolderDataBlockSig 0xA000000B
         struct _cshllink_extdatablk_knownfdblk{
             // BlockSize MUST be 0x0000001C
             // BlockSignature MUST be 0xA000000B
@@ -872,6 +921,8 @@
 
             - A PropertyStoreDataBlock structure specifies a set of properties that can be used by applications to store extra data in the shell link
         */
+        #define _CSHLLINK_EDBLK_PropertyStoreDataBlockSiz 0x0000000C
+        #define _CSHLLINK_EDBLK_PropertyStoreDataBlockSig 0xA0000009
         struct _cshllink_extdatablk_propsdblk{
             // BlockSize MUST be 0x0000000C
             // BlockSignature MUST be 0xA0000009
@@ -884,6 +935,8 @@
 
             - The ShimDataBlock structure specifies the name of a shim that can be applied when activating a link target
         */
+        #define _CSHLLINK_EDBLK_ShimDataBlockSiz 0x00000088
+        #define _CSHLLINK_EDBLK_ShimDataBlockSig 0xA0000008
         struct _cshllink_extdatablk_shimblk{
             // BlockSize MUST be 0x00000088
             // BlockSignature MUST be 0xA0000008
@@ -896,6 +949,8 @@
 
             - The SpecialFolderDataBlock structure specifies the location of a special folder. This data can be used when a link target is a special folder to keep track of the folder, so that the link target IDList can be translated when the link is loaded
         */
+        #define _CSHLLINK_EDBLK_SpecialFolderDataBlockSiz 0x00000010
+        #define _CSHLLINK_EDBLK_SpecialFolderDataBlockSig 0xA0000005
         struct _cshllink_extdatablk_specfdblk{
             // BlockSize MUST be 0x00000010
             // BlockSignature MUST be 0xA0000005
@@ -910,6 +965,8 @@
 
             - The TrackerDataBlock structure specifies data that can be used to resolve a link target if it is not found in its original location when the link is resolved. This data is passed to the Link Tracking service [MS-DLTW] to find the link target
         */
+        #define _CSHLLINK_EDBLK_TrackerDataBlockSiz 0x00000060
+        #define _CSHLLINK_EDBLK_TrackerDataBlockSig 0xA0000003
         struct _cshllink_extdatablk_trackdblk{
             // BlockSize MUST be 0x00000060
             // BlockSignature MUST be 0xA0000003
@@ -930,6 +987,8 @@
 
             - The VistaAndAboveIDListDataBlock structure specifies an alternate IDList that can be used instead of the LinkTargetIDList structure (section 2.2) on platforms that (The VistaAndAboveIDListDataBlock structure is not supported on Windows NT operating system, Windows 2000, Windows XP, or Windows Server 2003) support it
         */
+        #define _CSHLLINK_EDBLK_VistaAndAboveIDListDataBlockSiz 0x0000000A
+        #define _CSHLLINK_EDBLK_VistaAndAboveIDListDataBlockSig 0xA000000C
         struct _cshllink_extdatablk_viidldblk{
             // BlockSize MUST be 0x0000000A
             // BlockSignature MUST be 0xA000000C
@@ -940,18 +999,19 @@
     /*
         SHLLINK ExtraDataBlock (terminated with TerminalBlock (4 Bytes NULL))
     */
+    #define _CSHLLINK_EDBLK_NUM 11
     struct _cshllink_extdatablk{
-        struct _cshllink_extdatablk_consdblk *ConsoleDataBlock;
-        struct _cshllink_extdatablk_consfdblk *ConsoleFEDataBlock;
-        struct _cshllink_extdatablk_darwdblk *DarwinDataBlock;
-        struct _cshllink_extdatablk_envdblk *EnvironmentVariableDataBlock;
-        struct _cshllink_extdatablk_icoenvdblk *IconEnvironmentDataBlock;
-        struct _cshllink_extdatablk_knownfdblk *KnownFolderDataBlock;
-        struct _cshllink_extdatablk_propsdblk *PropertyStoreDataBlock;
-        struct _cshllink_extdatablk_shimblk *ShimDataBlock;
-        struct _cshllink_extdatablk_specfdblk *SpecialFolderDataBlock;
-        struct _cshllink_extdatablk_trackdblk *TrackerDataBlock;
-        struct _cshllink_extdatablk_viidldblk *VistaAndAboveIDListDataBlock;
+        struct _cshllink_extdatablk_consdblk ConsoleDataBlock;
+        struct _cshllink_extdatablk_consfdblk ConsoleFEDataBlock;
+        struct _cshllink_extdatablk_darwdblk DarwinDataBlock;
+        struct _cshllink_extdatablk_envdblk EnvironmentVariableDataBlock;
+        struct _cshllink_extdatablk_icoenvdblk IconEnvironmentDataBlock;
+        struct _cshllink_extdatablk_knownfdblk KnownFolderDataBlock;
+        struct _cshllink_extdatablk_propsdblk PropertyStoreDataBlock;
+        struct _cshllink_extdatablk_shimblk ShimDataBlock;
+        struct _cshllink_extdatablk_specfdblk SpecialFolderDataBlock;
+        struct _cshllink_extdatablk_trackdblk TrackerDataBlock;
+        struct _cshllink_extdatablk_viidldblk VistaAndAboveIDListDataBlock;
     };
 
 
@@ -1025,6 +1085,28 @@
     /*
         read NULL terminated String
     */
-    uint8_t cshllink_rNULLstr(char *dest, uint8_t errv1, uint8_t errv2, FILE *fp);
+    uint32_t cshllink_rNULLstr(char **dest, uint8_t errv1, uint8_t errv2, FILE *fp);
+    uint32_t cshllink_rNULLwstr(char16_t **dest, uint8_t errv1, uint8_t errv2, FILE *fp);
+    
+    /*
+        read String
+    */
+    uint32_t cshllink_rstr(char **dest, uint8_t errv1, uint8_t errv2, FILE *fp, size_t size);
+    uint32_t cshllink_rwstr(char16_t **dest, uint8_t errv1, uint8_t errv2, FILE *fp, size_t size);
+
+    /*
+        Extra Data Block read functions
+    */
+    uint8_t _cshllink_readEConsoleDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEConsoleFEDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEDarwinDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEEnvironmentVariableDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEIconEnvironmentDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEKnownFolderDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEPropertyStoreDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEShimDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readESpecialFolderDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readETrackerDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEVistaAndAboveIDListDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
 
 #endif

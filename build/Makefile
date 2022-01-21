@@ -27,7 +27,7 @@ $(LIBN): $(src) $(wildcard *.o)
 	@rm $(LIB_RN).o
 
 exmpl: $(LIBN)
-	@$(CC) ../exmpl/exmpl.c $(CFLAGS) -o exmpl.o -I$(LIBSRC) -L$(LIBDIR) -lcshllink
+	$(CC) ../exmpl/exmpl.c $(CFLAGS) -o exmpl.o -I$(LIBSRC) -L$(LIBDIR) -lcshllink
 	./exmpl.o
 	rm exmpl.o
 

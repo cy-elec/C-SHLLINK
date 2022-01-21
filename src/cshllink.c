@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 
     uint8_t cshllink_error=0;
     /*
@@ -232,7 +233,7 @@
                     _cshllink_errint(_CSHLLINK_ERR_FIO);
 
                 //LocalBasePath
-                if(cshllink_rNULLstr(inputStruct->cshllink_lnkinfo.LocalBasePath, _CSHLLINK_ERR_NULLPLBP, _CSHLLINK_ERR_FIO, fp))
+                if(cshllink_rNULLstr(&inputStruct->cshllink_lnkinfo.LocalBasePath, _CSHLLINK_ERR_NULLPLBP, _CSHLLINK_ERR_FIO, fp))
                     return -1;
             }
             /*
@@ -270,41 +271,138 @@
                 }
 
                 //NetName
-                if(cshllink_rNULLstr(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_cnetrlnk.NetName, _CSHLLINK_ERR_NULLPNETN, _CSHLLINK_ERR_FIO, fp))
+                if(cshllink_rNULLstr(&inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_cnetrlnk.NetName, _CSHLLINK_ERR_NULLPNETN, _CSHLLINK_ERR_FIO, fp))
                         return -1;
                 
                 //DeviceName
-                if(cshllink_rNULLstr(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_cnetrlnk.DeviceName, _CSHLLINK_ERR_NULLPDEVN, _CSHLLINK_ERR_FIO, fp))
+                if(cshllink_rNULLstr(&inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_cnetrlnk.DeviceName, _CSHLLINK_ERR_NULLPDEVN, _CSHLLINK_ERR_FIO, fp))
                         return -1;
 
                 if(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_cnetrlnk.NetNameOffset>0x00000014) {
                     //NetNameUnicode
-                    if(cshllink_rNULLstr(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_cnetrlnk.NetNameUnicode, _CSHLLINK_ERR_NULLPNNU, _CSHLLINK_ERR_FIO, fp))
+                    if(cshllink_rNULLstr(&inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_cnetrlnk.NetNameUnicode, _CSHLLINK_ERR_NULLPNNU, _CSHLLINK_ERR_FIO, fp))
                             return -1;
 
                     //DeviceNameUnicode
-                    if(cshllink_rNULLstr(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_cnetrlnk.DeviceNameUnicode, _CSHLLINK_ERR_NULLPDNU, _CSHLLINK_ERR_FIO, fp))
+                    if(cshllink_rNULLstr(&inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_cnetrlnk.DeviceNameUnicode, _CSHLLINK_ERR_NULLPDNU, _CSHLLINK_ERR_FIO, fp))
                             return -1;
                 }
             }
 
             //CommonPathSuffix
-            if(cshllink_rNULLstr(inputStruct->cshllink_lnkinfo.CommonPathSuffix, _CSHLLINK_ERR_NULLPCPS, _CSHLLINK_ERR_FIO, fp))
+            if(cshllink_rNULLstr(&inputStruct->cshllink_lnkinfo.CommonPathSuffix, _CSHLLINK_ERR_NULLPCPS, _CSHLLINK_ERR_FIO, fp))
                     return -1;
 
             if(inputStruct->cshllink_lnkinfo.LinkInfoHeaderSize>=0x00000024) {
                 //LocalBasePathUnicode
                 if(inputStruct->cshllink_lnkinfo.LinkInfoFlags&CSHLLINK_LIF_VolumeIDAndLocalBasePath) {
-                    if(cshllink_rNULLstr(inputStruct->cshllink_lnkinfo.LocalBasePathUnicode, _CSHLLINK_ERR_NULLPLBPU, _CSHLLINK_ERR_FIO, fp))
+                    if(cshllink_rNULLstr(&inputStruct->cshllink_lnkinfo.LocalBasePathUnicode, _CSHLLINK_ERR_NULLPLBPU, _CSHLLINK_ERR_FIO, fp))
                         return -1;
                 }
                 //CommonPathSuffixUnicode
-                if(cshllink_rNULLstr(inputStruct->cshllink_lnkinfo.CommonPathSuffixUnicode, _CSHLLINK_ERR_NULLPCPSU, _CSHLLINK_ERR_FIO, fp))
+                if(cshllink_rNULLstr(&inputStruct->cshllink_lnkinfo.CommonPathSuffixUnicode, _CSHLLINK_ERR_NULLPCPSU, _CSHLLINK_ERR_FIO, fp))
                     return -1;
             }
         
         }
 
+        /*
+            StringData (all unicode 2 bytes)
+        */
+            if(inputStruct->cshllink_header.LinkFlags&CSHLLINK_LF_HasName) {
+                //NameString
+                if(fread(&inputStruct->cshllink_strdata.NameString.CountCharacters, 2, 1, fp)!=1)
+                    _cshllink_errint(_CSHLLINK_ERR_FIO);
+                if(cshllink_rwstr(&inputStruct->cshllink_strdata.NameString.UString, _CSHLLINK_ERR_NULLPSTRDNAME, _CSHLLINK_ERR_FIO, fp, inputStruct->cshllink_strdata.NameString.CountCharacters))
+                    return -1;
+            }
+            if(inputStruct->cshllink_header.LinkFlags&CSHLLINK_LF_HasRelativePath) {
+                //RelativePath
+                if(fread(&inputStruct->cshllink_strdata.RelativePath.CountCharacters, 2, 1, fp)!=1)
+                    _cshllink_errint(_CSHLLINK_ERR_FIO);
+                if(cshllink_rwstr(&inputStruct->cshllink_strdata.RelativePath.UString, _CSHLLINK_ERR_NULLPSTRDRPATH, _CSHLLINK_ERR_FIO, fp, inputStruct->cshllink_strdata.RelativePath.CountCharacters))
+                    return -1;
+            }
+            if(inputStruct->cshllink_header.LinkFlags&CSHLLINK_LF_HasWorkingDir) {
+                //WorkingDir
+                if(fread(&inputStruct->cshllink_strdata.WorkingDir.CountCharacters, 2, 1, fp)!=1)
+                    _cshllink_errint(_CSHLLINK_ERR_FIO);
+                if(cshllink_rwstr(&inputStruct->cshllink_strdata.WorkingDir.UString, _CSHLLINK_ERR_NULLPSTRDWDIR, _CSHLLINK_ERR_FIO, fp, inputStruct->cshllink_strdata.WorkingDir.CountCharacters))
+                    return -1;
+            }
+            if(inputStruct->cshllink_header.LinkFlags&CSHLLINK_LF_HasArguments) {
+                //CommandLineArguments
+                if(fread(&inputStruct->cshllink_strdata.CommandLineArguments.CountCharacters, 2, 1, fp)!=1)
+                    _cshllink_errint(_CSHLLINK_ERR_FIO);
+                if(cshllink_rwstr(&inputStruct->cshllink_strdata.CommandLineArguments.UString, _CSHLLINK_ERR_NULLPSTRDARG, _CSHLLINK_ERR_FIO, fp, inputStruct->cshllink_strdata.CommandLineArguments.CountCharacters))
+                    return -1;
+            }
+            if(inputStruct->cshllink_header.LinkFlags&CSHLLINK_LF_HasIconLocation) {
+                //IconLocation
+                if(fread(&inputStruct->cshllink_strdata.IconLocation.CountCharacters, 2, 1, fp)!=1)
+                    _cshllink_errint(_CSHLLINK_ERR_FIO);
+                if(cshllink_rwstr(&inputStruct->cshllink_strdata.IconLocation.UString, _CSHLLINK_ERR_NULLPSTRDICO, _CSHLLINK_ERR_FIO, fp, inputStruct->cshllink_strdata.IconLocation.CountCharacters))
+                    return -1;
+            }
+        /*
+            ExtraDataBlock
+        */
+        {
+            long int cpos=ftell(fp);
+            fseek(fp, 0, SEEK_END);
+            long int epos=ftell(fp)-4;      //TerminalBlock
+            fseek(fp, cpos, SEEK_SET);
+
+            for(int i=0; i<_CSHLLINK_EDBLK_NUM; i++) {
+                cpos=ftell(fp);
+                if(cpos>=epos) break;
+                
+                struct _cshllink_extdatablk_blk_info info={0};
+                if(fread(&info.BlockSize, 4, 1, fp)!=1) 
+                    _cshllink_errint(_CSHLLINK_ERR_FIO);
+                if(fread(&info.BlockSignature, 4, 1, fp)!=1) 
+                    _cshllink_errint(_CSHLLINK_ERR_FIO);
+
+                switch(info.BlockSignature) {
+                    case _CSHLLINK_EDBLK_ConsoleDataBlockSig:
+                        if(_cshllink_readEConsoleDataBlock(inputStruct, info, fp)) return -1;
+                        break;
+                    case _CSHLLINK_EDBLK_ConsoleFEDataBlockSig: 
+                        if(_cshllink_readEConsoleFEDataBlock(inputStruct, info, fp)) return -1;
+                        break;
+                    case _CSHLLINK_EDBLK_DarwinDataBlockSig: 
+                        if(_cshllink_readEDarwinDataBlock(inputStruct, info, fp)) return -1;
+                        break;
+                    case _CSHLLINK_EDBLK_EnvironmentVariableDataBlockSig: 
+                        if(_cshllink_readEEnvironmentVariableDataBlock(inputStruct, info, fp)) return -1;
+                        break;
+                    case _CSHLLINK_EDBLK_IconEnvironmentDataBlockSig: 
+                        if(_cshllink_readEIconEnvironmentDataBlock(inputStruct, info, fp)) return -1;
+                        break;
+                    case _CSHLLINK_EDBLK_KnownFolderDataBlockSig: 
+                        if(_cshllink_readEKnownFolderDataBlock(inputStruct, info, fp)) return -1;
+                        break;
+                    case _CSHLLINK_EDBLK_PropertyStoreDataBlockSig: 
+                        if(_cshllink_readEPropertyStoreDataBlock(inputStruct, info, fp)) return -1;
+                        break;
+                    case _CSHLLINK_EDBLK_ShimDataBlockSig: 
+                        if(_cshllink_readEShimDataBlock(inputStruct, info, fp)) return -1;
+                        break;
+                    case _CSHLLINK_EDBLK_SpecialFolderDataBlockSig: 
+                        if(_cshllink_readESpecialFolderDataBlock(inputStruct, info, fp)) return -1;
+                        break;
+                    case _CSHLLINK_EDBLK_TrackerDataBlockSig: 
+                        if(_cshllink_readETrackerDataBlock(inputStruct, info, fp)) return -1;
+                        break;
+                    case _CSHLLINK_EDBLK_VistaAndAboveIDListDataBlockSig: 
+                        if(_cshllink_readEVistaAndAboveIDListDataBlock(inputStruct, info, fp)) return -1;
+                        break;
+                    default: _cshllink_errint(_CSHLLINK_ERR_UNKEDBSIG);
+                }
+
+            }
+
+        }
 
         return 0;
     }
@@ -337,17 +435,224 @@
     /*
         read NULL terminated String
     */
-    uint8_t cshllink_rNULLstr(char *dest, uint8_t errv1, uint8_t errv2, FILE *fp) {
+    uint32_t cshllink_rNULLstr(char **dest, uint8_t errv1, uint8_t errv2, FILE *fp) {
         char tmpC=1;
         uint32_t tmpS=0;
         while(tmpC!=0) {
-            dest = realloc(dest, tmpS+1);
-            if(dest==NULL)
+            *dest = realloc(*dest, tmpS+1);
+            if(*dest==NULL)
                 _cshllink_errint(errv1);
-            if(fread(&dest[tmpS], 1, 1, fp) != 1)
+            if(fread(&(*dest)[tmpS], 1, 1, fp) != 1)
                 _cshllink_errint(errv2);
-            tmpC = dest[tmpS];
+            tmpC = (*dest)[tmpS];
             tmpS++;
         }
         return 0;
     }
+    uint32_t cshllink_rNULLwstr(char16_t **dest, uint8_t errv1, uint8_t errv2, FILE *fp) {
+        char16_t tmpC=1;
+        uint32_t tmpS=0;
+        while(tmpC!=0) {
+            *dest = realloc(*dest, (tmpS+1)*sizeof(char16_t));
+            if(*dest==NULL)
+                _cshllink_errint(errv1);
+            if(fread(&(*dest)[tmpS], sizeof(char16_t), 1, fp) != 1)
+                _cshllink_errint(errv2);
+            tmpC = (*dest)[tmpS];
+            tmpS++;
+        }
+        return 0;
+    }
+
+    /*
+        read String
+    */
+    uint32_t cshllink_rstr(char **dest, uint8_t errv1, uint8_t errv2, FILE *fp, size_t size) {
+        if(size==0) _cshllink_errint(errv1);
+        *dest = malloc(size);
+        if(*dest==NULL)
+            _cshllink_errint(errv1);
+        if(fread(*dest, 1, size, fp) != size)
+            _cshllink_errint(errv2);
+        return 0;
+    }
+    uint32_t cshllink_rwstr(char16_t **dest, uint8_t errv1, uint8_t errv2, FILE *fp, size_t size) {
+        if(size==0) _cshllink_errint(errv1);
+        *dest = malloc(size*sizeof(char16_t));
+        if(*dest==NULL)
+            _cshllink_errint(errv1);
+        if(fread(*dest, sizeof(char16_t), size, fp) != size)
+            _cshllink_errint(errv2);
+        return 0;
+    }
+
+    /*
+        Extra Data Block read functions
+    */
+    uint8_t _cshllink_readEConsoleDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp) {
+        if(input->cshllink_extdatablk.ConsoleDataBlock.info.BlockSignature!=0)
+            _cshllink_errint(_CSHLLINK_DUPEEX_ConsoleDataBlock);
+
+        if(info.BlockSize!=_CSHLLINK_EDBLK_ConsoleDataBlockSiz)
+            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+        input->cshllink_extdatablk.ConsoleDataBlock.info.BlockSize=info.BlockSize;
+
+        uint8_t *buf = malloc(_CSHLLINK_EDBLK_ConsoleDataBlockSiz-8);
+        if(fread(&buf, 1, _CSHLLINK_EDBLK_ConsoleDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_ConsoleDataBlockSiz-8)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        free(buf);
+        return 0;
+    }
+
+    uint8_t _cshllink_readEConsoleFEDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp) {
+        if(input->cshllink_extdatablk.ConsoleFEDataBlock.info.BlockSignature!=0)
+            _cshllink_errint(_CSHLLINK_DUPEEX_ConsoleFEDataBlock);
+        
+        if(info.BlockSize!=_CSHLLINK_EDBLK_ConsoleFEDataBlockSiz)
+            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+        input->cshllink_extdatablk.ConsoleFEDataBlock.info.BlockSize=info.BlockSize;
+
+        uint8_t *buf = malloc(_CSHLLINK_EDBLK_ConsoleFEDataBlockSiz-8);
+        if(fread(&buf, 1, _CSHLLINK_EDBLK_ConsoleFEDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_ConsoleFEDataBlockSiz-8)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        free(buf);
+        return 0;
+    }
+
+    uint8_t _cshllink_readEDarwinDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp) {
+        if(input->cshllink_extdatablk.DarwinDataBlock.info.BlockSignature!=0)
+            _cshllink_errint(_CSHLLINK_DUPEEX_DarwinDataBlock);
+        
+        if(info.BlockSize!=_CSHLLINK_EDBLK_DarwinDataBlockSiz)
+            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+        input->cshllink_extdatablk.DarwinDataBlock.info.BlockSize=info.BlockSize;
+
+        uint8_t *buf = malloc(_CSHLLINK_EDBLK_DarwinDataBlockSiz-8);
+        if(fread(&buf, 1, _CSHLLINK_EDBLK_DarwinDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_DarwinDataBlockSiz-8)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        free(buf);
+        return 0;
+    }
+
+    uint8_t _cshllink_readEEnvironmentVariableDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp) {
+        if(input->cshllink_extdatablk.EnvironmentVariableDataBlock.info.BlockSignature!=0)
+            _cshllink_errint(_CSHLLINK_DUPEEX_EnvironmentVariableDataBlock);
+        
+        if(info.BlockSize!=_CSHLLINK_EDBLK_EnvironmentVariableDataBlockSiz)
+            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+        input->cshllink_extdatablk.EnvironmentVariableDataBlock.info.BlockSize=info.BlockSize;
+
+        uint8_t *buf = malloc(_CSHLLINK_EDBLK_EnvironmentVariableDataBlockSiz-8);
+        if(fread(&buf, 1, _CSHLLINK_EDBLK_EnvironmentVariableDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_EnvironmentVariableDataBlockSiz-8)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        free(buf);
+        return 0;
+    }
+
+    uint8_t _cshllink_readEIconEnvironmentDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp) {
+        if(input->cshllink_extdatablk.IconEnvironmentDataBlock.info.BlockSignature!=0)
+            _cshllink_errint(_CSHLLINK_DUPEEX_IconEnvironmentDataBlock);
+        
+        if(info.BlockSize!=_CSHLLINK_EDBLK_IconEnvironmentDataBlockSiz)
+            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+        input->cshllink_extdatablk.IconEnvironmentDataBlock.info.BlockSize=info.BlockSize;
+
+        uint8_t *buf = malloc(_CSHLLINK_EDBLK_IconEnvironmentDataBlockSiz-8);
+        if(fread(&buf, 1, _CSHLLINK_EDBLK_IconEnvironmentDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_IconEnvironmentDataBlockSiz-8)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        free(buf);
+        return 0;
+    }
+
+    uint8_t _cshllink_readEKnownFolderDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp) {
+        if(input->cshllink_extdatablk.KnownFolderDataBlock.info.BlockSignature!=0)
+            _cshllink_errint(_CSHLLINK_DUPEEX_KnownFolderDataBlock);
+        
+        if(info.BlockSize!=_CSHLLINK_EDBLK_KnownFolderDataBlockSiz)
+            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+        input->cshllink_extdatablk.KnownFolderDataBlock.info.BlockSize=info.BlockSize;
+
+        uint8_t *buf = malloc(_CSHLLINK_EDBLK_KnownFolderDataBlockSiz-8);
+        if(fread(&buf, 1, _CSHLLINK_EDBLK_KnownFolderDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_KnownFolderDataBlockSiz-8)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        free(buf);
+        return 0;
+    }
+
+    uint8_t _cshllink_readEPropertyStoreDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp) {
+        if(input->cshllink_extdatablk.PropertyStoreDataBlock.info.BlockSignature!=0)
+            _cshllink_errint(_CSHLLINK_DUPEEX_PropertyStoreDataBlock);
+        
+        if(info.BlockSize!=_CSHLLINK_EDBLK_PropertyStoreDataBlockSiz)
+            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+        input->cshllink_extdatablk.PropertyStoreDataBlock.info.BlockSize=info.BlockSize;
+
+        uint8_t *buf = malloc(_CSHLLINK_EDBLK_ShimDataBlockSiz-8);
+        if(fread(&buf, 1, _CSHLLINK_EDBLK_ShimDataBlockSiz-4, fp)!=_CSHLLINK_EDBLK_ShimDataBlockSiz-8)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        free(buf);
+        return 0;
+    }
+
+    uint8_t _cshllink_readEShimDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp) {
+        if(input->cshllink_extdatablk.ShimDataBlock.info.BlockSignature!=0)
+            _cshllink_errint(_CSHLLINK_DUPEEX_ShimDataBlock);
+        
+        if(info.BlockSize!=_CSHLLINK_EDBLK_ShimDataBlockSiz)
+            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+        input->cshllink_extdatablk.ShimDataBlock.info.BlockSize=info.BlockSize;
+
+        uint8_t *buf = malloc(_CSHLLINK_EDBLK_ShimDataBlockSiz-8);
+        if(fread(&buf, 1, _CSHLLINK_EDBLK_ShimDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_ShimDataBlockSiz-8)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        free(buf);
+        return 0;
+    }
+
+    uint8_t _cshllink_readESpecialFolderDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp) {
+        if(input->cshllink_extdatablk.SpecialFolderDataBlock.info.BlockSignature!=0)
+            _cshllink_errint(_CSHLLINK_DUPEEX_SpecialFolderDataBlock);
+        
+        if(info.BlockSize!=_CSHLLINK_EDBLK_SpecialFolderDataBlockSiz)
+            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+        input->cshllink_extdatablk.SpecialFolderDataBlock.info.BlockSize=info.BlockSize;
+
+        uint8_t *buf = malloc(_CSHLLINK_EDBLK_SpecialFolderDataBlockSiz-8);
+        if(fread(&buf, 1, _CSHLLINK_EDBLK_SpecialFolderDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_SpecialFolderDataBlockSiz-8)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        free(buf);
+        return 0;
+    }
+
+    uint8_t _cshllink_readETrackerDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp) {
+        if(input->cshllink_extdatablk.TrackerDataBlock.info.BlockSignature!=0)
+            _cshllink_errint(_CSHLLINK_DUPEEX_TrackerDataBlock);
+        
+        printf("0x%lx:\t0x%x -- 0x%x\n", ftell(fp), info.BlockSize, _CSHLLINK_EDBLK_TrackerDataBlockSiz);
+
+        if(info.BlockSize!=_CSHLLINK_EDBLK_TrackerDataBlockSiz)
+            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+        input->cshllink_extdatablk.TrackerDataBlock.info.BlockSize=info.BlockSize;
+
+        char *buf = malloc(_CSHLLINK_EDBLK_TrackerDataBlockSiz-8);
+        if(fread(buf, 1, _CSHLLINK_EDBLK_TrackerDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_TrackerDataBlockSiz-8)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        free(buf);
+        return 0;
+    }
+
+    uint8_t _cshllink_readEVistaAndAboveIDListDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp) {
+        if(input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.info.BlockSignature!=0)
+            _cshllink_errint(_CSHLLINK_DUPEEX_VistaAndAboveIDListDataBlock);
+        
+        if(info.BlockSize!=_CSHLLINK_EDBLK_VistaAndAboveIDListDataBlockSiz)
+            _cshllink_errint(_CSHLLINK_DUPEEX_WRONGSIZE);
+        input->cshllink_extdatablk.VistaAndAboveIDListDataBlock.info.BlockSize=info.BlockSize;
+
+        uint8_t *buf = malloc(_CSHLLINK_EDBLK_VistaAndAboveIDListDataBlockSiz-8);
+        if(fread(&buf, 1, _CSHLLINK_EDBLK_VistaAndAboveIDListDataBlockSiz-8, fp)!=_CSHLLINK_EDBLK_VistaAndAboveIDListDataBlockSiz-8)
+            _cshllink_errint(_CSHLLINK_ERR_FIO);
+        free(buf);
+        return 0;
+    }
+
