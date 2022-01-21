@@ -47,6 +47,7 @@
             cshllink tmp = {0};
             *inputStruct = tmp;
         }
+        cshllink_free(inputStruct);
 
         // read FILE
         return cshllink_loadFile_i(fp, inputStruct);
@@ -140,7 +141,7 @@
                     _cshllink_errint(_CSHLLINK_ERR_FIO);
                 
                 tmpS-=inputStruct->cshllink_lnktidl.cshllink_lnktidl_idl.idl_item[inputStruct->cshllink_lnktidl.cshllink_lnktidl_idl.idl_inum].item_size;
-                inputStruct->cshllink_lnktidl.cshllink_lnktidl_idl.idl_inum++;
+                inputStruct->cshllink_lnktidl.cshllink_lnktidl_idl.idl_inum+=1;
             }
             uint16_t nullb;
             if(fread(&nullb, 2, 1, fp)!=1)
@@ -830,7 +831,10 @@
         free(inputStruct->cshllink_lnkinfo.CommonPathSuffixUnicode);
         free(inputStruct->cshllink_lnkinfo.LocalBasePath);
         free(inputStruct->cshllink_lnkinfo.LocalBasePathUnicode);
-        free(inputStruct->cshllink_lnktidl.cshllink_lnktidl_idl.idl_item);
+        for(int i=0; i<inputStruct->cshllink_lnktidl.cshllink_lnktidl_idl.idl_inum; i++) {
+            //free(inputStruct->cshllink_lnktidl.cshllink_lnktidl_idl.idl_item[0].item);
+        }
+        //free(inputStruct->cshllink_lnktidl.cshllink_lnktidl_idl.idl_item);
         free(inputStruct->cshllink_strdata.CommandLineArguments.UString);
         free(inputStruct->cshllink_strdata.IconLocation.UString);
         free(inputStruct->cshllink_strdata.NameString.UString);
