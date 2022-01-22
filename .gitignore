@@ -39,3 +39,5 @@ dkms.conf
 #custom
 exmpl/
 *.lnk
+workspace.code-workspace
+.vscode/
