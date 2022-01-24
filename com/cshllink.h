@@ -586,9 +586,9 @@
         // A NULL–terminated string, defined by the system default code page, which is used to construct the full path to the link item or link target by being appended to the string in the LocalBasePath field
         char *CommonPathSuffix;
         // An optional, NULL–terminated, Unicode string that is used to construct the full path to the link item or link target by appending the string in the CommonPathSuffixUnicode field. This field can be present only if the VolumeIDAndLocalBasePath flag is set and the value of the LinkInfoHeaderSize field is greater than or equal to 0x00000024
-        char *LocalBasePathUnicode;
+        char16_t *LocalBasePathUnicode;
         // An optional, NULL–terminated, Unicode string that is used to construct the full path to the link item or link target by being appended to the string in the LocalBasePathUnicode field. This field can be present only if the value of the LinkInfoHeaderSize field is greater than or equal to 0x00000024
-        char *CommonPathSuffixUnicode;
+        char16_t *CommonPathSuffixUnicode;
     };
 
     /*
@@ -1090,7 +1090,12 @@
         exact error codes are stored in cshllink_error
     */
     uint8_t cshllink_writeFile(FILE *fp, cshllink *inputStruct);
-
+    
+    /*
+        Processes outputFile
+    */
+    uint8_t cshllink_writeFile_i(FILE *fp, cshllink *inputStruct);
+    
     /*
         Converts little Endian to big Endian and vice versa
     */
@@ -1109,19 +1114,46 @@
     uint32_t cshllink_rwstr(char16_t **dest, uint8_t errv1, uint8_t errv2, FILE *fp, size_t size);
 
     /*
+        write NULL terminated String
+    */
+    uint32_t cshllink_wNULLstr(char **dest, uint8_t errv1, uint8_t errv2, FILE *fp);
+    uint32_t cshllink_wNULLwstr(char16_t **dest, uint8_t errv1, uint8_t errv2, FILE *fp);
+    
+    /*
+        write String
+    */
+    uint32_t cshllink_wstr(char **dest, uint8_t errv1, uint8_t errv2, FILE *fp, size_t size);
+    uint32_t cshllink_wwstr(char16_t **dest, uint8_t errv1, uint8_t errv2, FILE *fp, size_t size);
+
+    /*
         Extra Data Block read functions
     */
-    uint8_t _cshllink_readEConsoleDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
-    uint8_t _cshllink_readEConsoleFEDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
-    uint8_t _cshllink_readEDarwinDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
-    uint8_t _cshllink_readEEnvironmentVariableDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
-    uint8_t _cshllink_readEIconEnvironmentDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
-    uint8_t _cshllink_readEKnownFolderDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
-    uint8_t _cshllink_readEPropertyStoreDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
-    uint8_t _cshllink_readEShimDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
-    uint8_t _cshllink_readESpecialFolderDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
-    uint8_t _cshllink_readETrackerDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
-    uint8_t _cshllink_readEVistaAndAboveIDListDataBlock(cshllink *input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEConsoleDataBlock(cshllink **input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEConsoleFEDataBlock(cshllink **input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEDarwinDataBlock(cshllink **input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEEnvironmentVariableDataBlock(cshllink **input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEIconEnvironmentDataBlock(cshllink **input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEKnownFolderDataBlock(cshllink **input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEPropertyStoreDataBlock(cshllink **input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEShimDataBlock(cshllink **input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readESpecialFolderDataBlock(cshllink **input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readETrackerDataBlock(cshllink **input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+    uint8_t _cshllink_readEVistaAndAboveIDListDataBlock(cshllink **input, const struct _cshllink_extdatablk_blk_info info, FILE *fp);
+
+    /*
+        Extra Data Block write functions
+    */
+    uint8_t _cshllink_writeEConsoleDataBlock(cshllink **input, FILE *fp);
+    uint8_t _cshllink_writeEConsoleFEDataBlock(cshllink **input, FILE *fp);
+    uint8_t _cshllink_writeEDarwinDataBlock(cshllink **input, FILE *fp);
+    uint8_t _cshllink_writeEEnvironmentVariableDataBlock(cshllink **input, FILE *fp);
+    uint8_t _cshllink_writeEIconEnvironmentDataBlock(cshllink **input, FILE *fp);
+    uint8_t _cshllink_writeEKnownFolderDataBlock(cshllink **input, FILE *fp);
+    uint8_t _cshllink_writeEPropertyStoreDataBlock(cshllink **input, FILE *fp);
+    uint8_t _cshllink_writeEShimDataBlock(cshllink **input, FILE *fp);
+    uint8_t _cshllink_writeESpecialFolderDataBlock(cshllink **input, FILE *fp);
+    uint8_t _cshllink_writeETrackerDataBlock(cshllink **input, FILE *fp);
+    uint8_t _cshllink_writeEVistaAndAboveIDListDataBlock(cshllink **input, FILE *fp);
     
     /*
         frees whole structure
