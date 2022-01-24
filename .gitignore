@@ -37,7 +37,7 @@ Mkfile.old
 dkms.conf
 
 #custom
-exmpl/
+exmpl/*
 !exmpl/exmpl.c
 *.lnk
 workspace.code-workspace
