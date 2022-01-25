@@ -1188,172 +1188,172 @@
         /*
             enable VolumeID and LocalBasePath
         */
-        uint8_t cshllink_enableVolumeIDAndLocalBasePath(struct cshllink *inputStruct);
+        uint8_t cshllink_enableVolumeIDAndLocalBasePath(cshllink *inputStruct);
         /*
             disable VolumeID and LocalBasePath
         */
-        uint8_t cshllink_disableVolumeIDAndLocalBasePath(struct cshllink *inputStruct);
+        uint8_t cshllink_disableVolumeIDAndLocalBasePath(cshllink *inputStruct);
         /*
             set VolumeIDData
         */  
-        uint8_t cshllink_setVolumeIDData(struct cshllink *inputStruct, char *data, uint32_t size);
+        uint8_t cshllink_setVolumeIDData(cshllink *inputStruct, char *data, uint32_t size);
         /*
             set LocalBasePath
         */
-        uint8_t cshllink_setLocalBasePath(struct cshllink *inputStruct, char *data);
+        uint8_t cshllink_setLocalBasePath(cshllink *inputStruct, char *data);
         /*
             set LocalBasePathUnicode
         */
-        uint8_t cshllink_setLocalBasePathUnicode(struct cshllink *inputStruct, char16_t *data);
+        uint8_t cshllink_setLocalBasePathUnicode(cshllink *inputStruct, char16_t *data);
 
     //CommonNetworkRelativeLink
         /*
             set NetName
         */
-        uint8_t cshllink_setNetName(struct cshllink *inputStruct, char *data); 
+        uint8_t cshllink_setNetName(cshllink *inputStruct, char *data); 
         /*
             set DeviceName
         */ 
-        uint8_t cshllink_setDeviceName(struct cshllink *inputStruct, char *data); 
+        uint8_t cshllink_setDeviceName(cshllink *inputStruct, char *data); 
         /*
             set NetNameUnicode
         */ 
-        uint8_t cshllink_setNetNameUnicode(struct cshllink *inputStruct, char16_t *data); 
+        uint8_t cshllink_setNetNameUnicode(cshllink *inputStruct, char16_t *data); 
         /*
             set DeviceNameUnicode
         */
-        uint8_t cshllink_setDeviceNameUnicode(struct cshllink *inputStruct, char16_t *data); 
+        uint8_t cshllink_setDeviceNameUnicode(cshllink *inputStruct, char16_t *data); 
 
 
     //LNKINFO
         /*
             set CommonPathSuffix
         */
-        uint8_t cshllink_setCommonPathSuffix(struct cshllink *inputStruct, char *data);
+        uint8_t cshllink_setCommonPathSuffix(cshllink *inputStruct, char *data);
         /*
             set CommonPathSuffixUnicode
         */
-        uint8_t cshllink_setCommonPathSuffixUnicode(struct cshllink *inputStruct, char16_t *data);
+        uint8_t cshllink_setCommonPathSuffixUnicode(cshllink *inputStruct, char16_t *data);
 
 
     //StringData
         /*
             set NameString
         */
-        uint8_t cshllink_setNameString(struct cshllink *inputStruct, char16_t *data, uint16_t len);
+        uint8_t cshllink_setNameString(cshllink *inputStruct, char16_t *data, uint16_t len);
         /*
             set RelativePath
         */
-        uint8_t cshllink_setRelativePath(struct cshllink *inputStruct, char16_t *data, uint16_t len);
+        uint8_t cshllink_setRelativePath(cshllink *inputStruct, char16_t *data, uint16_t len);
         /*
             set WorkingDir
         */
-        uint8_t cshllink_setWorkingDir(struct cshllink *inputStruct, char16_t *data, uint16_t len);
+        uint8_t cshllink_setWorkingDir(cshllink *inputStruct, char16_t *data, uint16_t len);
         /*
             set CommandLineArguments
         */
-        uint8_t cshllink_setCommandLineArguments(struct cshllink *inputStruct, char16_t *data, uint16_t len);
+        uint8_t cshllink_setCommandLineArguments(cshllink *inputStruct, char16_t *data, uint16_t len);
         /*
             set IconLocation
         */
-        uint8_t cshllink_setIconLocation(struct cshllink *inputStruct, char16_t *data, uint16_t len);
+        uint8_t cshllink_setIconLocation(cshllink *inputStruct, char16_t *data, uint16_t len);
 
 
     //EXTRA DATA
         /*
             disable EXTDB
         */
-        uint8_t cshllink_disableConsoleDB(struct cshllink *inputStruct);
-        uint8_t cshllink_disableConsoleFEDB(struct cshllink *inputStruct);
-        uint8_t cshllink_disableDarwinDB(struct cshllink *inputStruct);
-        uint8_t cshllink_disableEnvironmentVariableDB(struct cshllink *inputStruct);
-        uint8_t cshllink_disableIconEnvironmentDB(struct cshllink *inputStruct);
-        uint8_t cshllink_disableKnownFolderDB(struct cshllink *inputStruct);
-        uint8_t cshllink_disablePropertyStoreDB(struct cshllink *inputStruct);
-        uint8_t cshllink_disableShimDB(struct cshllink *inputStruct);
-        uint8_t cshllink_disableTrackerDB(struct cshllink *inputStruct);
-        uint8_t cshllink_disableVistaAndAboveIDListDB(struct cshllink *inputStruct);
+        uint8_t cshllink_disableConsoleDB(cshllink *inputStruct);
+        uint8_t cshllink_disableConsoleFEDB(cshllink *inputStruct);
+        uint8_t cshllink_disableDarwinDB(cshllink *inputStruct);
+        uint8_t cshllink_disableEnvironmentVariableDB(cshllink *inputStruct);
+        uint8_t cshllink_disableIconEnvironmentDB(cshllink *inputStruct);
+        uint8_t cshllink_disableKnownFolderDB(cshllink *inputStruct);
+        uint8_t cshllink_disablePropertyStoreDB(cshllink *inputStruct);
+        uint8_t cshllink_disableShimDB(cshllink *inputStruct);
+        uint8_t cshllink_disableTrackerDB(cshllink *inputStruct);
+        uint8_t cshllink_disableVistaAndAboveIDListDB(cshllink *inputStruct);
         /*
             enable EXTDB
         */
-        uint8_t cshllink_enableConsoleDB(struct cshllink *inputStruct);
-        uint8_t cshllink_enableConsoleFEDB(struct cshllink *inputStruct);
-        uint8_t cshllink_enableDarwinDB(struct cshllink *inputStruct);
-        uint8_t cshllink_enableEnvironmentVariableDB(struct cshllink *inputStruct);
-        uint8_t cshllink_enableIconEnvironmentDB(struct cshllink *inputStruct);
-        uint8_t cshllink_enableKnownFolderDB(struct cshllink *inputStruct);
-        uint8_t cshllink_enablePropertyStoreDB(struct cshllink *inputStruct);
-        uint8_t cshllink_enableShimDB(struct cshllink *inputStruct);
-        uint8_t cshllink_enableTrackerDB(struct cshllink *inputStruct);
-        uint8_t cshllink_enableVistaAndAboveIDListDB(struct cshllink *inputStruct);
+        uint8_t cshllink_enableConsoleDB(cshllink *inputStruct);
+        uint8_t cshllink_enableConsoleFEDB(cshllink *inputStruct);
+        uint8_t cshllink_enableDarwinDB(cshllink *inputStruct);
+        uint8_t cshllink_enableEnvironmentVariableDB(cshllink *inputStruct);
+        uint8_t cshllink_enableIconEnvironmentDB(cshllink *inputStruct);
+        uint8_t cshllink_enableKnownFolderDB(cshllink *inputStruct);
+        uint8_t cshllink_enablePropertyStoreDB(cshllink *inputStruct);
+        uint8_t cshllink_enableShimDB(cshllink *inputStruct);
+        uint8_t cshllink_enableTrackerDB(cshllink *inputStruct);
+        uint8_t cshllink_enableVistaAndAboveIDListDB(cshllink *inputStruct);
         
         //ConsoleDB
         /*
             set FontFaceName (32 char)
         */
-        uint8_t cshllink_setFontFaceName(struct cshllink *inputStruct, char16_t *faceName);
+        uint8_t cshllink_setFontFaceName(cshllink *inputStruct, char16_t *faceName);
 
         //DarwinDB
         /*
             set DarwinDataAnsi (260 byte)
         */
-        uint8_t cshllink_setDarwinDataAnsi(struct cshllink *inputStruct, char16_t *data);
+        uint8_t cshllink_setDarwinDataAnsi(cshllink *inputStruct, char16_t *data);
         /*
             set DarwinDataUnicode (520 byte)
         */
-        uint8_t cshllink_setDarwinDataUnicode(struct cshllink *inputStruct, char16_t *data);
+        uint8_t cshllink_setDarwinDataUnicode(cshllink *inputStruct, char16_t *data);
 
         //EnvironmentVariableDB
         /*
             set TargetAnsi (260 byte)
         */
-        uint8_t cshllink_setEnvironmentVariableTargetAnsi(struct cshllink *inputStruct, char *data);
+        uint8_t cshllink_setEnvironmentVariableTargetAnsi(cshllink *inputStruct, char *data);
         /*
             set TargetUnicode (520 byte)
         */
-        uint8_t cshllink_setEnvironmentVariableTargetUnicode(struct cshllink *inputStruct, char16_t *data);
+        uint8_t cshllink_setEnvironmentVariableTargetUnicode(cshllink *inputStruct, char16_t *data);
 
         //IconEnvironmentDB
         /*
             set TargetAnsi (260 byte)
         */
-        uint8_t cshllink_setIconEnvironmentTargetAnsi(struct cshllink *inputStruct, char *data);
+        uint8_t cshllink_setIconEnvironmentTargetAnsi(cshllink *inputStruct, char *data);
         /*
             set TargetUnicode (520 byte)
         */
-        uint8_t cshllink_setIconEnvironmentTargetUnicode(struct cshllink *inputStruct, char16_t *data);
+        uint8_t cshllink_setIconEnvironmentTargetUnicode(cshllink *inputStruct, char16_t *data);
 
         //KnownFolderDB
         /*
             set KnownFolderID (16 byte)
         */
-        uint8_t cshllink_setKnownFolderID(struct cshllink *inputStruct, uint8_t *knownFolderID);
+        uint8_t cshllink_setKnownFolderID(cshllink *inputStruct, uint8_t *knownFolderID);
 
         //PropertyStoreDB
         /*
             set PropteryStore (min 4 bytes) - "size" in bytes
         */
-        uint8_t cshllink_setPropertyStore(struct cshllink *inputStruct, uint8_t *propertyStore, uint32_t size);
+        uint8_t cshllink_setPropertyStore(cshllink *inputStruct, uint8_t *propertyStore, uint32_t size);
 
         //ShimDB
         /*
             set LayerName (min 128 bytes) - "size" in bytes
         */
-        uint8_t cshllink_setShimLayerName(struct cshllink *inputStruct, char16_t *layerName, uint32_t size);
+        uint8_t cshllink_setShimLayerName(cshllink *inputStruct, char16_t *layerName, uint32_t size);
 
         //TrackerDB
         /*
             set MachineID (16 bytes)
         */
-        uint8_t cshllink_setTrackerMachineID(struct cshllink *inputStruct, char *machineID);
+        uint8_t cshllink_setTrackerMachineID(cshllink *inputStruct, char *machineID);
         /*
             set Droid (32 byte)
         */
-        uint8_t cshllink_setTrackerDroi(struct cshllink *inputStruct, uint8_t *droid);
+        uint8_t cshllink_setTrackerDroi(cshllink *inputStruct, uint8_t *droid);
         /*
             set DroidBirth (32 byte)
         */
-        uint8_t cshllink_setTrackerDroidBirth(struct cshllink *inputStruct, uint8_t *droidBirth);
+        uint8_t cshllink_setTrackerDroidBirth(cshllink *inputStruct, uint8_t *droidBirth);
     
         //VistaAndAboveIDListDB
         /*
