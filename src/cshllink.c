@@ -14,7 +14,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wchar.h>
 
     uint8_t cshllink_error=0;
     /*
@@ -1661,6 +1660,340 @@
         free(inputStruct->cshllink_strdata.NameString.UString);
         free(inputStruct->cshllink_strdata.RelativePath.UString);
         free(inputStruct->cshllink_strdata.WorkingDir.UString);
+    }
+
+    //IDList (also for VistaAndAboveIDList -- param idl pointer)
+        /*
+            set idl item
+            IN: pointer to IDL item; data for item; length in bytes of data
+            OUT: 0 - Success
+                 255 - Error
+        */
+        uint8_t cshllink_setIDListItem(struct _cshllink_lnktidl_idl_item *item, uint8_t *data, uint16_t len) {
+            
+        }
+        /*
+            add idl item
+            IN: pointer to List of IDL items; data for new item; length in bytes of data
+            OUT: 0 - Success
+                 255 - Error
+        */
+        uint8_t cshllink_addIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t *data, uint16_t len) {
+            
+        }
+        /*
+            remove idl item
+            IN: pointer to List of IDL items; index to be removed
+            OUT: 0 - Success
+                 255 - Error
+        */
+        uint8_t cshllink_removeIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t index) {
+            
+        }
+
+    //VOLID and LocalBasePath
+        /*
+            enable VolumeID and LocalBasePath
+        */
+        uint8_t cshllink_enableVolumeIDAndLocalBasePath(struct cshllink *inputStruct) {
+            
+        }
+        /*
+            disable VolumeID and LocalBasePath
+        */
+        uint8_t cshllink_disableVolumeIDAndLocalBasePath(struct cshllink *inputStruct) {
+            
+        }
+        /*
+            set VolumeIDData
+        */  
+        uint8_t cshllink_setVolumeIDData(struct cshllink *inputStruct, char *data, uint32_t size) {
+            
+        }
+        /*
+            set LocalBasePath
+        */
+        uint8_t cshllink_setLocalBasePath(struct cshllink *inputStruct, char *data) {
+            
+        }
+        /*
+            set LocalBasePathUnicode
+        */
+        uint8_t cshllink_setLocalBasePathUnicode(struct cshllink *inputStruct, char16_t *data) {
+            
+        }
+
+    //CommonNetworkRelativeLink
+        /*
+            set NetName
+        */
+        uint8_t cshllink_setNetName(struct cshllink *inputStruct, char *data) {
+            
+        } 
+        /*
+            set DeviceName
+        */ 
+        uint8_t cshllink_setDeviceName(struct cshllink *inputStruct, char *data) {
+            
+        } 
+        /*
+            set NetNameUnicode
+        */ 
+        uint8_t cshllink_setNetNameUnicode(struct cshllink *inputStruct, char16_t *data) {
+            
+        } 
+        /*
+            set DeviceNameUnicode
+        */
+        uint8_t cshllink_setDeviceNameUnicode(struct cshllink *inputStruct, char16_t *data) {
+            
+        } 
+
+
+    //LNKINFO
+        /*
+            set CommonPathSuffix
+        */
+        uint8_t cshllink_setCommonPathSuffix(struct cshllink *inputStruct, char *data) {
+            
+        }
+        /*
+            set CommonPathSuffixUnicode
+        */
+        uint8_t cshllink_setCommonPathSuffixUnicode(struct cshllink *inputStruct, char16_t *data) {
+            
+        }
+
+
+    //StringData
+        /*
+            set NameString
+        */
+        uint8_t cshllink_setNameString(struct cshllink *inputStruct, char16_t *data, uint16_t len) {
+            
+        }
+        /*
+            set RelativePath
+        */
+        uint8_t cshllink_setRelativePath(struct cshllink *inputStruct, char16_t *data, uint16_t len) {
+            
+        }
+        /*
+            set WorkingDir
+        */
+        uint8_t cshllink_setWorkingDir(struct cshllink *inputStruct, char16_t *data, uint16_t len) {
+            
+        }
+        /*
+            set CommandLineArguments
+        */
+        uint8_t cshllink_setCommandLineArguments(struct cshllink *inputStruct, char16_t *data, uint16_t len) {
+            
+        }
+        /*
+            set IconLocation
+        */
+        uint8_t cshllink_setIconLocation(struct cshllink *inputStruct, char16_t *data, uint16_t len) {
+            
+        }
+
+
+    //EXTRA DATA
+        /*
+            disable EXTDB
+        */
+        uint8_t cshllink_disableConsoleDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_disableConsoleFEDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_disableDarwinDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_disableEnvironmentVariableDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_disableIconEnvironmentDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_disableKnownFolderDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_disablePropertyStoreDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_disableShimDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_disableTrackerDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_disableVistaAndAboveIDListDB(struct cshllink *inputStruct) {
+            
+        }
+        /*
+            enable EXTDB
+        */
+        uint8_t cshllink_enableConsoleDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_enableConsoleFEDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_enableDarwinDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_enableEnvironmentVariableDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_enableIconEnvironmentDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_enableKnownFolderDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_enablePropertyStoreDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_enableShimDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_enableTrackerDB(struct cshllink *inputStruct) {
+            
+        }
+        uint8_t cshllink_enableVistaAndAboveIDListDB(struct cshllink *inputStruct) {
+            
+        }
+        
+        //ConsoleDB
+        /*
+            set FontFaceName (32 char)
+        */
+        uint8_t cshllink_setFontFaceName(struct cshllink *inputStruct, char16_t *faceName) {
+            
+        }
+
+        //DarwinDB
+        /*
+            set DarwinDataAnsi (260 byte)
+        */
+        uint8_t cshllink_setDarwinDataAnsi(struct cshllink *inputStruct, char16_t *data) {
+            
+        }
+        /*
+            set DarwinDataUnicode (520 byte)
+        */
+        uint8_t cshllink_setDarwinDataUnicode(struct cshllink *inputStruct, char16_t *data) {
+            
+        }
+
+        //EnvironmentVariableDB
+        /*
+            set TargetAnsi (260 byte)
+        */
+        uint8_t cshllink_setEnvironmentVariableTargetAnsi(struct cshllink *inputStruct, char *data) {
+            
+        }
+        /*
+            set TargetUnicode (520 byte)
+        */
+        uint8_t cshllink_setEnvironmentVariableTargetUnicode(struct cshllink *inputStruct, char16_t *data) {
+            
+        }
+
+        //IconEnvironmentDB
+        /*
+            set TargetAnsi (260 byte)
+        */
+        uint8_t cshllink_setIconEnvironmentTargetAnsi(struct cshllink *inputStruct, char *data) {
+            
+        }
+        /*
+            set TargetUnicode (520 byte)
+        */
+        uint8_t cshllink_setIconEnvironmentTargetUnicode(struct cshllink *inputStruct, char16_t *data) {
+            
+        }
+
+        //KnownFolderDB
+        /*
+            set KnownFolderID (16 byte)
+        */
+        uint8_t cshllink_setKnownFolderID(struct cshllink *inputStruct, uint8_t *knownFolderID) {
+            
+        }
+
+        //PropertyStoreDB
+        /*
+            set PropteryStore (min 4 bytes) - "size" in bytes
+        */
+        uint8_t cshllink_setPropertyStore(struct cshllink *inputStruct, uint8_t *propertyStore, uint32_t size) {
+            
+        }
+
+        //ShimDB
+        /*
+            set LayerName (min 128 bytes) - "size" in bytes
+        */
+        uint8_t cshllink_setShimLayerName(struct cshllink *inputStruct, char16_t *layerName, uint32_t size) {
+            
+        }
+
+        //TrackerDB
+        /*
+            set MachineID (16 bytes)
+        */
+        uint8_t cshllink_setTrackerMachineID(struct cshllink *inputStruct, char *machineID) {
+            
+        }
+        /*
+            set Droid (32 byte)
+        */
+        uint8_t cshllink_setTrackerDroi(struct cshllink *inputStruct, uint8_t *droid) {
+            
+        }
+        /*
+            set DroidBirth (32 byte)
+        */
+        uint8_t cshllink_setTrackerDroidBirth(struct cshllink *inputStruct, uint8_t *droidBirth) {
+            
+        }
+    
+        //VistaAndAboveIDListDB
+        /*
+            set idl item
+            IN: pointer to IDL item; data for item; length in bytes of data
+            OUT: 0 - Success
+                 255 - Error
+        */
+        uint8_t cshllink_setVistaAndAboveIDListItem(struct _cshllink_lnktidl_idl_item *item, uint8_t *data, uint16_t len) {
+            
+        }
+        /*
+            add idl item
+            IN: pointer to List of IDL items; data for new item; length in bytes of data
+            OUT: 0 - Success
+                 255 - Error
+        */
+        uint8_t cshllink_addVistaAndAboveIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t *data, uint16_t len) {
+            
+        }
+        /*
+            remove idl item
+            IN: pointer to List of IDL items; index to be removed
+            OUT: 0 - Success
+                 255 - Error
+        */
+        uint8_t cshllink_removeVistaAndAboveIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t index) {
+            
+        }
+
+    /*
+        converts ansi to unicode
+    */
+    uint8_t cshllink_ansiToUni(char16_t *dest, char *src) {
+        
     }
 
     #pragma endregion

@@ -1160,4 +1160,159 @@
     */
     void cshllink_free(cshllink *inputStruct);
 
+
+    //IDList (also for VistaAndAboveIDList -- param idl pointer)
+        /*
+            set idl item
+            IN: pointer to IDL item; data for item; length in bytes of data
+            OUT: 0 - Success
+                 255 - Error
+        */
+        uint8_t cshllink_setIDListItem(struct _cshllink_lnktidl_idl_item *item, uint8_t *data, uint16_t len);
+        /*
+            add idl item
+            IN: pointer to List of IDL items; data for new item; length in bytes of data
+            OUT: 0 - Success
+                 255 - Error
+        */
+        uint8_t cshllink_addIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t *data, uint16_t len);
+        /*
+            remove idl item
+            IN: pointer to List of IDL items; index to be removed
+            OUT: 0 - Success
+                 255 - Error
+        */
+        uint8_t cshllink_removeIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t index);
+
+    //VOLID and LocalBasePath
+        /*
+            enable VolumeID and LocalBasePath
+        */
+        uint8_t cshllink_enableVolumeIDAndLocalBasePath(void);
+        /*
+            disable VolumeID and LocalBasePath
+            - removes 
+        */
+        uint8_t cshllink_disableVolumeIDAndLocalBasePath(void);
+        /*
+            set VolumeIDData
+        */  
+        //uint8_t cshllink_setVolumeIDData
+        /*
+            set LocalBasePath
+        */
+        /*
+            set LocalBasePathUnicode
+        */
+
+    //CommonNetworkRelativeLink
+        /*
+            set NetName
+        */ 
+        /*
+            set DeviceName
+        */ 
+        /*
+            set NetNameUnicode
+        */ 
+        /*
+            set DeviceNameUnicode
+        */
+
+
+    //LNKINFO
+        /*
+            set CommonPathSuffix
+        */
+        /*
+            set CommonPathSuffixUnicode
+        */
+
+
+    //StringData
+        /*
+            set NameString
+        */
+        /*
+            set RelativePath
+        */
+        /*
+            set WorkingDir
+        */
+        /*
+            set CommandLineArguments
+        */
+        /*
+            set IconLocation
+        */
+
+
+    //EXTRA DATA
+        /*
+            disable EXTDB
+        */
+        /*
+            enable EXTDB
+        */
+        
+        //ConsoleDB
+        /*
+            set FontFaceName
+        */
+
+        //DarwinDB
+        /*
+            set DarwinDataAnsi
+        */
+        /*
+            set DarwinDataUnicode
+        */
+
+        //EnvironmentVariableDB
+        /*
+            set TargetAnsi
+        */
+        /*
+            set TargetUnicode
+        */
+
+        //IconEnvironmentDB
+        /*
+            set TargetAnsi
+        */
+        /*
+            set TargetUnicode
+        */
+
+        //KnownFolderDB
+        /*
+            set KnownFolderID (16 byte)
+        */
+
+        //PropertyStoreDB
+        /*
+            set PropteryStore
+        */
+
+        //ShimDB
+        /*
+            set LayerName
+        */
+
+        //TrackerDB
+        /*
+            set MachineID
+        */
+        /*
+            set Droid (32 byte)
+        */
+        /*
+            set DroidBirth (32 byte)
+        */
+    
+
+    /*
+        converts char to unicode
+    */
+
 #endif
