@@ -240,8 +240,14 @@
                 if(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data==NULL)
                     _cshllink_errint(_CSHLLINK_ERR_NULLPVIDD);
                 //Data
-                if(fread(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data, sizeof(char), inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize-VtmpSize, fp) != inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize-VtmpSize)
-                    _cshllink_errint(_CSHLLINK_ERR_FIO);
+                if(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeLabelOffset==0x00000014) {
+                    if(fread(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data, sizeof(char16_t), (inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize-VtmpSize)/2, fp) != (inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize-VtmpSize)/2)
+                        _cshllink_errint(_CSHLLINK_ERR_FIO);
+                }
+                else {
+                    if(fread(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data, sizeof(char), inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize-VtmpSize, fp) != inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize-VtmpSize)
+                        _cshllink_errint(_CSHLLINK_ERR_FIO);
+                }
 
                 //LocalBasePath
                 if(cshllink_rNULLstr(&inputStruct->cshllink_lnkinfo.LocalBasePath, _CSHLLINK_ERR_NULLPLBP, _CSHLLINK_ERR_FIO, fp))
@@ -1065,8 +1071,14 @@
                 if(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data==NULL)
                     _cshllink_errint(_CSHLLINK_ERR_NULLPVIDD);
                 //Data
-                if(fwrite(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data, inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize-VtmpSize, 1, fp) != 1)
-                    _cshllink_errint(_CSHLLINK_ERR_FIO);
+                if(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeLabelOffset==0x00000014) {
+                    if(fwrite(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data, sizeof(char16_t), (inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize-VtmpSize)/2, fp) != (inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize-VtmpSize)/2)
+                        _cshllink_errint(_CSHLLINK_ERR_FIO);
+                }
+                else {
+                    if(fwrite(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data, sizeof(char), inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize-VtmpSize, fp) != inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize-VtmpSize)
+                        _cshllink_errint(_CSHLLINK_ERR_FIO);
+                }
 
                 //LocalBasePath
                 if(cshllink_wNULLstr(&inputStruct->cshllink_lnkinfo.LocalBasePath, _CSHLLINK_ERR_NULLPLBP, _CSHLLINK_ERR_FIO, fp))
@@ -1665,12 +1677,23 @@
     //IDList (also for VistaAndAboveIDList -- param idl pointer)
         /*
             set idl item
-            IN: pointer to IDL item; data for item; length in bytes of data
+            IN: pointer to IDL item; data for item; length in bytes of data;
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_setIDListItem(struct _cshllink_lnktidl_idl_item *item, uint8_t *data, uint16_t len) {
+        uint8_t cshllink_setIDListItem(struct _cshllink_lnktidl *list, uint8_t *data, uint16_t size, uint8_t index) {
+            if(index>=list->cshllink_lnktidl_idl.idl_inum)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPIDL);
+            //set new size
+            if(list->cshllink_lnktidl_idl.idl_item[index].item_size>size)
+                list->idl_size-= (list->cshllink_lnktidl_idl.idl_item[index].item_size - size);
+            else if(list->cshllink_lnktidl_idl.idl_item[index].item_size<size)
+                list->idl_size-= (list->cshllink_lnktidl_idl.idl_item[index].item_size - size);
+            
+            if(_cshllink_setIDListItem(&list->cshllink_lnktidl_idl.idl_item[index], data, size))
+                return -1;
 
+            return 0;
         }
         /*
             add idl item
@@ -1678,8 +1701,14 @@
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_addIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t *data, uint16_t len) {
+        uint8_t cshllink_addIDListItem(struct _cshllink_lnktidl *list, uint8_t *data, uint16_t size) {
+            //set new size
+            list->idl_size += size + 2;
 
+            if(_cshllink_addIDListItem(&list->cshllink_lnktidl_idl, data, size))
+                return -1;
+
+            return 0;
         }
         /*
             remove idl item
@@ -1687,40 +1716,225 @@
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_removeIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t index) {
+        uint8_t cshllink_removeIDListItem(struct _cshllink_lnktidl *list, uint8_t index) {
+            if(index>=list->cshllink_lnktidl_idl.idl_inum)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPIDL);
+            
+            if(index>=list->cshllink_lnktidl_idl.idl_inum)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPIDL);
 
+            //set new size
+            list->idl_size -= (list->cshllink_lnktidl_idl.idl_item[index].item_size+2);
+
+            if(_cshllink_removeIDListItem(&list->cshllink_lnktidl_idl, index))
+                return -1;
+
+            return 0;
         }
+
+            //IDList integ. (also for VistaAndAboveIDList -- param idl pointer)
+            /*
+                set idl item
+                IN: pointer to IDL item; data for item; length in bytes of data;
+                OUT: 0 - Success
+                    255 - Error
+            */
+            uint8_t _cshllink_setIDListItem(struct _cshllink_lnktidl_idl_item *item, uint8_t *data, uint16_t size) {
+                
+                item->item_size = size;
+                item->item=realloc(item->item, sizeof *item->item * size);
+                if(item->item==NULL) 
+                    _cshllink_errint(_CSHLLINK_ERR_NULLPIDLM);
+
+                memcpy(item->item, data, size);
+
+                return 0;
+
+            }
+            /*
+                add idl item
+                IN: pointer to List of IDL items; data for new item; length in bytes of data
+                OUT: 0 - Success
+                    255 - Error
+            */
+            uint8_t _cshllink_addIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t *data, uint16_t size) {
+
+                //realloc mem
+                list->idl_item = realloc(list->idl_item, (size+2)* sizeof *list->idl_item);
+                if(list->idl_item==NULL) 
+                    _cshllink_errint(_CSHLLINK_ERR_NULLPIDL);
+
+                if(_cshllink_setIDListItem(&list->idl_item[list->idl_inum], data, size))
+                    return -1;
+
+                list->idl_inum+=1;
+
+                return 0;
+            }
+            /*
+                remove idl item
+                IN: pointer to List of IDL items; index to be removed
+                OUT: 0 - Success
+                    255 - Error
+            */
+            uint8_t _cshllink_removeIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t index) {
+                if(index>=list->idl_inum)
+                    _cshllink_errint(_CSHLLINK_ERR_NULLPIDL);
+
+                int size = list->idl_item[index].item_size+2;
+                free(list->idl_item[index].item);
+                
+                for(int i=index+1; i<list->idl_inum; i++) {
+                    list->idl_item[i-1] = list->idl_item[i];
+                }
+
+                //realloc mem
+                list->idl_item = realloc(list->idl_item, (size)* sizeof *list->idl_item);
+                if(list->idl_item==NULL) 
+                    _cshllink_errint(_CSHLLINK_ERR_NULLPIDL);
+                
+                list->idl_inum-=1;
+
+                return 0;
+            }
 
     //VOLID and LocalBasePath
         /*
             enable VolumeID and LocalBasePath
         */
         uint8_t cshllink_enableVolumeIDAndLocalBasePath(cshllink *inputStruct) {
+            
+            
+            if(inputStruct->cshllink_lnkinfo.LinkInfoFlags&CSHLLINK_LIF_VolumeIDAndLocalBasePath)
+                return 0;
+            
+            inputStruct->cshllink_lnkinfo.LinkInfoFlags|=CSHLLINK_LIF_VolumeIDAndLocalBasePath;
+            
 
+            //VolumeIDSize
+            inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize = 17;
+
+            //DriveType (unknown)
+            inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.DriveType = 0;
+            
+            //DriveSerialNumber (unknown)
+            inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.DriveSerialNumber = 0;
+
+            //VolumeLabelOffset
+            inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeLabelOffset = 0x00000016;
+
+            //DATA
+            inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data = realloc(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data, 1);
+            if(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data==NULL)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPVIDD);
+            //Data
+            *inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data = 0;
+
+            inputStruct->cshllink_lnkinfo.LocalBasePathOffset = inputStruct->cshllink_lnkinfo.LinkInfoHeaderSize + inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize;
+
+            //LocalBasePath
+            inputStruct->cshllink_lnkinfo.LocalBasePath = realloc(inputStruct->cshllink_lnkinfo.LocalBasePath, 1);
+            if(inputStruct->cshllink_lnkinfo.LocalBasePath==NULL)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPVIDD);
+            //LocalBasePath
+            *inputStruct->cshllink_lnkinfo.LocalBasePath = 0;
+            
+            //set size of link info
+            inputStruct->cshllink_lnkinfo.LinkInfoHeaderSize = 28;
+            inputStruct->cshllink_lnkinfo.LinkInfoSize = 28 + inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize + 1;
+
+            return 0;
         }
         /*
             disable VolumeID and LocalBasePath
         */
         uint8_t cshllink_disableVolumeIDAndLocalBasePath(cshllink *inputStruct) {
+            if(!(inputStruct->cshllink_lnkinfo.LinkInfoFlags&CSHLLINK_LIF_VolumeIDAndLocalBasePath))
+                return 0;
+            
+            inputStruct->cshllink_lnkinfo.LinkInfoFlags&=~CSHLLINK_LIF_VolumeIDAndLocalBasePath;
 
+            free(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data);
+
+            inputStruct->cshllink_lnkinfo.LocalBasePathOffset = 0;
+            inputStruct->cshllink_lnkinfo.LinkInfoSize -= inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize + strlen(inputStruct->cshllink_lnkinfo.LocalBasePath) + 1;
+
+            if(inputStruct->cshllink_lnkinfo.LinkInfoHeaderSize>=0x00000024) {
+                inputStruct->cshllink_lnkinfo.LinkInfoHeaderSize -= 4;
+                inputStruct->cshllink_lnkinfo.LinkInfoSize -= 4 + cshllink_strlen16(inputStruct->cshllink_lnkinfo.LocalBasePathUnicode) + 1; 
+            }
+
+            return 0;
         }
         /*
             set VolumeIDData
         */  
-        uint8_t cshllink_setVolumeIDData(cshllink *inputStruct, char *data, uint32_t size) {
+        uint8_t cshllink_setVolumeIDDataAnsi(cshllink *inputStruct, char *data, uint32_t size) {
 
+            inputStruct->cshllink_lnkinfo.LinkInfoSize += -inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize + 16 + size;
+            inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize= 16 + size;
+
+            if(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeLabelOffsetUnicode!=0) {
+                inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeLabelOffsetUnicode = 0;
+            }
+            inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeLabelOffset = 0x00000010;
+
+            inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data = realloc(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data, sizeof *inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data * size);
+            if(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data==NULL)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPVIDD);
+            
+            memcpy(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data, data, size);
+
+            return 0;
+        }
+        uint8_t cshllink_setVolumeIDDataUnicode(cshllink *inputStruct, char16_t *data, uint32_t size) {
+
+            inputStruct->cshllink_lnkinfo.LinkInfoSize += -inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize + 20 + size;
+            inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeIDSize= 20 + size;
+
+            if(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeLabelOffset!=0x00000014) {
+                inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeLabelOffset = 0x00000014;
+            }
+            inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.VolumeLabelOffsetUnicode = 0x00000014;
+
+            inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data = realloc(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data, sizeof *inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data * size);
+            if(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data==NULL)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPVIDD);
+
+            memcpy(inputStruct->cshllink_lnkinfo.cshllink_lnkinfo_volid.Data, data, size);
+
+            return 0;
         }
         /*
             set LocalBasePath
         */
         uint8_t cshllink_setLocalBasePath(cshllink *inputStruct, char *data) {
 
+            if(!inputStruct->cshllink_lnkinfo.LinkInfoFlags&CSHLLINK_LIF_VolumeIDAndLocalBasePath) return -1;
+
+            if(inputStruct->cshllink_lnkinfo.LinkInfoHeaderSize>=0x00000024) {
+                inputStruct->cshllink_lnkinfo.LinkInfoHeaderSize -= 4;
+                inputStruct->cshllink_lnkinfo.LinkInfoSize -= 4 + cshllink_strlen16(inputStruct->cshllink_lnkinfo.LocalBasePathUnicode) + 1;
+            }
+
+            memcpy(inputStruct->cshllink_lnkinfo.LocalBasePath, data, strlen(data)+1);
+
+            return 0;
         }
         /*
             set LocalBasePathUnicode
         */
         uint8_t cshllink_setLocalBasePathUnicode(cshllink *inputStruct, char16_t *data) {
+            if(!inputStruct->cshllink_lnkinfo.LinkInfoFlags&CSHLLINK_LIF_VolumeIDAndLocalBasePath) return -1;
 
+            if(inputStruct->cshllink_lnkinfo.LinkInfoHeaderSize<0x00000024) {
+                inputStruct->cshllink_lnkinfo.LinkInfoHeaderSize += 4;
+                inputStruct->cshllink_lnkinfo.LinkInfoSize += 4 - strlen(inputStruct->cshllink_lnkinfo.LocalBasePath) + 1;
+            }
+
+            memcpy(inputStruct->cshllink_lnkinfo.LocalBasePath, data, cshllink_strlen16(data)+1);
+
+            return 0;
         }
 
     //CommonNetworkRelativeLink
@@ -1728,25 +1942,25 @@
             set NetName
         */
         uint8_t cshllink_setNetName(cshllink *inputStruct, char *data) {
-
+            return 0;
         } 
         /*
             set DeviceName
         */ 
         uint8_t cshllink_setDeviceName(cshllink *inputStruct, char *data) {
-
+            return 0;
         } 
         /*
             set NetNameUnicode
         */ 
         uint8_t cshllink_setNetNameUnicode(cshllink *inputStruct, char16_t *data) {
-
+            return 0;
         } 
         /*
             set DeviceNameUnicode
         */
         uint8_t cshllink_setDeviceNameUnicode(cshllink *inputStruct, char16_t *data) {
-
+            return 0;
         } 
 
 
@@ -1755,13 +1969,13 @@
             set CommonPathSuffix
         */
         uint8_t cshllink_setCommonPathSuffix(cshllink *inputStruct, char *data) {
-
+            return 0;
         }
         /*
             set CommonPathSuffixUnicode
         */
         uint8_t cshllink_setCommonPathSuffixUnicode(cshllink *inputStruct, char16_t *data) {
-
+            return 0;
         }
 
 
@@ -1770,31 +1984,83 @@
             set NameString
         */
         uint8_t cshllink_setNameString(cshllink *inputStruct, char16_t *data, uint16_t len) {
+            inputStruct->cshllink_strdata.NameString.CountCharacters=len;
+            if(len==0) {
+                free(inputStruct->cshllink_strdata.NameString.UString);
+                return 0;
+            }
+            inputStruct->cshllink_strdata.NameString.UString = realloc(inputStruct->cshllink_strdata.NameString.UString, sizeof *inputStruct->cshllink_strdata.NameString.UString * len);
+            if(inputStruct->cshllink_strdata.NameString.UString==NULL)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPSTRDNAME);
+            memcpy(inputStruct->cshllink_strdata.NameString.UString, data, len*sizeof(char16_t));
 
+            return 0;
         }
         /*
             set RelativePath
         */
         uint8_t cshllink_setRelativePath(cshllink *inputStruct, char16_t *data, uint16_t len) {
+            inputStruct->cshllink_strdata.RelativePath.CountCharacters=len;
+            if(len==0) {
+                free(inputStruct->cshllink_strdata.RelativePath.UString);
+                return 0;
+            }
+            inputStruct->cshllink_strdata.RelativePath.UString = realloc(inputStruct->cshllink_strdata.RelativePath.UString, sizeof *inputStruct->cshllink_strdata.RelativePath.UString * len);
+            if(inputStruct->cshllink_strdata.RelativePath.UString==NULL)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPSTRDNAME);
+            memcpy(inputStruct->cshllink_strdata.RelativePath.UString, data, len*sizeof(char16_t));
 
+            return 0;
         }
         /*
             set WorkingDir
         */
         uint8_t cshllink_setWorkingDir(cshllink *inputStruct, char16_t *data, uint16_t len) {
+            inputStruct->cshllink_strdata.WorkingDir.CountCharacters=len;
+            if(len==0) {
+                free(inputStruct->cshllink_strdata.WorkingDir.UString);
+                return 0;
+            }
+            inputStruct->cshllink_strdata.WorkingDir.UString = realloc(inputStruct->cshllink_strdata.WorkingDir.UString, sizeof *inputStruct->cshllink_strdata.WorkingDir.UString * len);
+            if(inputStruct->cshllink_strdata.WorkingDir.UString==NULL)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPSTRDNAME);
+            memcpy(inputStruct->cshllink_strdata.WorkingDir.UString, data, len*sizeof(char16_t));
 
+            return 0;
         }
         /*
             set CommandLineArguments
         */
         uint8_t cshllink_setCommandLineArguments(cshllink *inputStruct, char16_t *data, uint16_t len) {
+            inputStruct->cshllink_strdata.CommandLineArguments.CountCharacters=len;
+            if(len==0) {
+                free(inputStruct->cshllink_strdata.CommandLineArguments.UString);
+                return 0;
+            }
+            inputStruct->cshllink_strdata.CommandLineArguments.UString = realloc(inputStruct->cshllink_strdata.CommandLineArguments.UString, sizeof *inputStruct->cshllink_strdata.CommandLineArguments.UString * len);
+            if(inputStruct->cshllink_strdata.CommandLineArguments.UString==NULL)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPSTRDNAME);
+            memcpy(inputStruct->cshllink_strdata.CommandLineArguments.UString, data, len*sizeof(char16_t));
 
+            return 0;
         }
         /*
             set IconLocation
         */
         uint8_t cshllink_setIconLocation(cshllink *inputStruct, char16_t *data, uint16_t len) {
+            
 
+            inputStruct->cshllink_strdata.IconLocation.CountCharacters=len;
+            if(len==0) {
+                free(inputStruct->cshllink_strdata.IconLocation.UString);
+                return 0;
+            }
+            inputStruct->cshllink_strdata.IconLocation.UString = realloc(inputStruct->cshllink_strdata.IconLocation.UString, sizeof *inputStruct->cshllink_strdata.IconLocation.UString * len);
+            if(inputStruct->cshllink_strdata.IconLocation.UString==NULL)
+                _cshllink_errint(_CSHLLINK_ERR_NULLPSTRDNAME);
+            memcpy(inputStruct->cshllink_strdata.IconLocation.UString, data, len*sizeof(char16_t));
+
+            return 0;
         }
 
 
@@ -1803,67 +2069,67 @@
             disable EXTDB
         */
         uint8_t cshllink_disableConsoleDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_disableConsoleFEDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_disableDarwinDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_disableEnvironmentVariableDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_disableIconEnvironmentDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_disableKnownFolderDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_disablePropertyStoreDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_disableShimDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_disableTrackerDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_disableVistaAndAboveIDListDB(cshllink *inputStruct) {
-
+            return 0;
         }
         /*
             enable EXTDB
         */
         uint8_t cshllink_enableConsoleDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_enableConsoleFEDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_enableDarwinDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_enableEnvironmentVariableDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_enableIconEnvironmentDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_enableKnownFolderDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_enablePropertyStoreDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_enableShimDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_enableTrackerDB(cshllink *inputStruct) {
-
+            return 0;
         }
         uint8_t cshllink_enableVistaAndAboveIDListDB(cshllink *inputStruct) {
-
+            return 0;
         }
         
         //ConsoleDB
@@ -1871,21 +2137,39 @@
             set FontFaceName (32 char)
         */
         uint8_t cshllink_setFontFaceName(cshllink *inputStruct, char16_t *faceName) {
-
+            return 0;
         }
 
         //DarwinDB
         /*
             set DarwinDataAnsi (260 byte)
         */
-        uint8_t cshllink_setDarwinDataAnsi(cshllink *inputStruct, char16_t *data) {
+        uint8_t cshllink_setDarwinDataAnsi(cshllink *inputStruct, char *data) {
+            
+            size_t len = strlen(data);
+            inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataAnsi = realloc(inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataAnsi, 260);
+            if(inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataAnsi==NULL)
+                _cshllink_errint(_CSHLLINK_ERRX_NULLPSTRDARDA);
+            memcpy(inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataAnsi, data, len);
+            len--;
+            while(len++<259) inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataAnsi[len]=0;
 
+            return 0;
         }
         /*
             set DarwinDataUnicode (520 byte)
         */
         uint8_t cshllink_setDarwinDataUnicode(cshllink *inputStruct, char16_t *data) {
+            
+            size_t len = cshllink_strlen16(data);
+            inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataUnicode = realloc(inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataUnicode, 520);
+            if(inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataUnicode==NULL)
+                _cshllink_errint(_CSHLLINK_ERRX_NULLPSTRIENVDU);
+            memcpy(inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataUnicode, data, len*2);
+            len--;
+            while(len++<259) inputStruct->cshllink_extdatablk.DarwinDataBlock.DarwinDataUnicode[len]=0;
 
+            return 0;
         }
 
         //EnvironmentVariableDB
@@ -1893,13 +2177,31 @@
             set TargetAnsi (260 byte)
         */
         uint8_t cshllink_setEnvironmentVariableTargetAnsi(cshllink *inputStruct, char *data) {
+            
+            size_t len = strlen(data);
+            inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetAnsi = realloc(inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetAnsi, 260);
+            if(inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetAnsi==NULL)
+                _cshllink_errint(_CSHLLINK_ERRX_NULLPSTRENVDA);
+            memcpy(inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetAnsi, data, len);
+            len--;
+            while(len++<259) inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetAnsi[len]=0;
 
+            return 0;
         }
         /*
             set TargetUnicode (520 byte)
         */
         uint8_t cshllink_setEnvironmentVariableTargetUnicode(cshllink *inputStruct, char16_t *data) {
+            
+            size_t len = cshllink_strlen16(data);
+            inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetUnicode = realloc(inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetUnicode, 520);
+            if(inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetUnicode==NULL)
+                _cshllink_errint(_CSHLLINK_ERRX_NULLPSTRIENVDU);
+            memcpy(inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetUnicode, data, len*2);
+            len--;
+            while(len++<259) inputStruct->cshllink_extdatablk.EnvironmentVariableDataBlock.TargetUnicode[len]=0;
 
+            return 0;
         }
 
         //IconEnvironmentDB
@@ -1908,12 +2210,31 @@
         */
         uint8_t cshllink_setIconEnvironmentTargetAnsi(cshllink *inputStruct, char *data) {
 
+            size_t len = strlen(data);
+            inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetAnsi = realloc(inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetAnsi, 260);
+            if(inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetAnsi==NULL)
+                _cshllink_errint(_CSHLLINK_ERRX_NULLPSTRIENVDA);
+            memcpy(inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetAnsi, data, len);
+            len--;
+            while(len++<259) inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetAnsi[len]=0;
+
+            return 0;
         }
         /*
             set TargetUnicode (520 byte)
         */
         uint8_t cshllink_setIconEnvironmentTargetUnicode(cshllink *inputStruct, char16_t *data) {
 
+            size_t len = cshllink_strlen16(data);
+            inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetUnicode = realloc(inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetUnicode, 520);
+            if(inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetUnicode==NULL)
+                _cshllink_errint(_CSHLLINK_ERRX_NULLPSTRIENVDU);
+            memcpy(inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetUnicode, data, len*2);
+            len--;
+            while(len++<259) {
+                inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetUnicode[len]=0;
+            }
+            return 0;
         }
 
         //KnownFolderDB
@@ -1921,7 +2242,7 @@
             set KnownFolderID (16 byte)
         */
         uint8_t cshllink_setKnownFolderID(cshllink *inputStruct, uint8_t *knownFolderID) {
-
+            return 0;
         }
 
         //PropertyStoreDB
@@ -1929,7 +2250,7 @@
             set PropteryStore (min 4 bytes) - "size" in bytes
         */
         uint8_t cshllink_setPropertyStore(cshllink *inputStruct, uint8_t *propertyStore, uint32_t size) {
-
+            return 0;
         }
 
         //ShimDB
@@ -1937,7 +2258,7 @@
             set LayerName (min 128 bytes) - "size" in bytes
         */
         uint8_t cshllink_setShimLayerName(cshllink *inputStruct, char16_t *layerName, uint32_t size) {
-
+            return 0;
         }
 
         //TrackerDB
@@ -1945,19 +2266,19 @@
             set MachineID (16 bytes)
         */
         uint8_t cshllink_setTrackerMachineID(cshllink *inputStruct, char *machineID) {
-
+            return 0;
         }
         /*
             set Droid (32 byte)
         */
         uint8_t cshllink_setTrackerDroi(cshllink *inputStruct, uint8_t *droid) {
-
+            return 0;
         }
         /*
             set DroidBirth (32 byte)
         */
         uint8_t cshllink_setTrackerDroidBirth(cshllink *inputStruct, uint8_t *droidBirth) {
-
+            return 0;
         }
     
         //VistaAndAboveIDListDB
@@ -1967,8 +2288,8 @@
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_setVistaAndAboveIDListItem(struct _cshllink_lnktidl_idl_item *item, uint8_t *data, uint16_t len) {
-
+        uint8_t cshllink_setVistaAndAboveIDListItem(struct _cshllink_extdatablk_viidldblk *viaail, uint8_t *data, uint16_t size, uint8_t index) {
+            return 0;
         }
         /*
             add idl item
@@ -1976,8 +2297,8 @@
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_addVistaAndAboveIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t *data, uint16_t len) {
-
+        uint8_t cshllink_addVistaAndAboveIDListItem(struct _cshllink_extdatablk_viidldblk *viaail, uint8_t *data, uint16_t size) {
+            return 0;
         }
         /*
             remove idl item
@@ -1985,15 +2306,37 @@
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_removeVistaAndAboveIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t index) {
-
+        uint8_t cshllink_removeVistaAndAboveIDListItem(struct _cshllink_extdatablk_viidldblk *viaail, uint8_t index) {
+            return 0;
         }
 
     /*
         converts ansi to unicode
     */
     uint8_t cshllink_ansiToUni(char16_t *dest, char *src) {
+        
+        int i=0;
+        while(src[i]!=0) {
+            dest[i]=src[i];
+            i++;
+        }
+        dest[i]=0;
+        return i;
 
+    }
+
+    /*
+        strlen char16
+    */
+    size_t cshllink_strlen16(char16_t *src) {
+        size_t size=0;
+
+        while(*src!=0) {
+            src++;
+            size++;
+        }
+
+        return size;
     }
 
     #pragma endregion

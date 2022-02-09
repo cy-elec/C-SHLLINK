@@ -1164,25 +1164,48 @@
     //IDList (also for VistaAndAboveIDList -- param idl pointer)
         /*
             set idl item
-            IN: pointer to IDL item; data for item; length in bytes of data
+            IN: pointer to IDL item; data for item; length in bytes of data;
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_setIDListItem(struct _cshllink_lnktidl_idl_item *item, uint8_t *data, uint16_t len);
+        uint8_t cshllink_setIDListItem(struct _cshllink_lnktidl *list, uint8_t *data, uint16_t size, uint8_t index);
         /*
             add idl item
             IN: pointer to List of IDL items; data for new item; length in bytes of data
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_addIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t *data, uint16_t len);
+        uint8_t cshllink_addIDListItem(struct _cshllink_lnktidl *list, uint8_t *data, uint16_t size);
         /*
             remove idl item
             IN: pointer to List of IDL items; index to be removed
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_removeIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t index);
+        uint8_t cshllink_removeIDListItem(struct _cshllink_lnktidl *list, uint8_t index);
+
+            //IDList integ. (also for VistaAndAboveIDList -- param idl pointer)
+            /*
+                set idl item
+                IN: pointer to IDL item; data for item; length in bytes of data;
+                OUT: 0 - Success
+                    255 - Error
+            */
+            uint8_t _cshllink_setIDListItem(struct _cshllink_lnktidl_idl_item *item, uint8_t *data, uint16_t size);
+            /*
+                add idl item
+                IN: pointer to List of IDL items; data for new item; length in bytes of data
+                OUT: 0 - Success
+                    255 - Error
+            */
+            uint8_t _cshllink_addIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t *data, uint16_t size);
+            /*
+                remove idl item
+                IN: pointer to List of IDL items; index to be removed
+                OUT: 0 - Success
+                    255 - Error
+            */
+            uint8_t _cshllink_removeIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t index);
 
     //VOLID and LocalBasePath
         /*
@@ -1196,7 +1219,8 @@
         /*
             set VolumeIDData
         */  
-        uint8_t cshllink_setVolumeIDData(cshllink *inputStruct, char *data, uint32_t size);
+        uint8_t cshllink_setVolumeIDDataAnsi(cshllink *inputStruct, char *data, uint32_t size);
+        uint8_t cshllink_setVolumeIDDataUnicode(cshllink *inputStruct, char16_t *data, uint32_t size);
         /*
             set LocalBasePath
         */
@@ -1297,7 +1321,7 @@
         /*
             set DarwinDataAnsi (260 byte)
         */
-        uint8_t cshllink_setDarwinDataAnsi(cshllink *inputStruct, char16_t *data);
+        uint8_t cshllink_setDarwinDataAnsi(cshllink *inputStruct, char *data);
         /*
             set DarwinDataUnicode (520 byte)
         */
@@ -1362,25 +1386,30 @@
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_setVistaAndAboveIDListItem(struct _cshllink_lnktidl_idl_item *item, uint8_t *data, uint16_t len);
+        uint8_t cshllink_setVistaAndAboveIDListItem(struct _cshllink_extdatablk_viidldblk *viaail, uint8_t *data, uint16_t size, uint8_t index);
         /*
             add idl item
             IN: pointer to List of IDL items; data for new item; length in bytes of data
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_addVistaAndAboveIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t *data, uint16_t len);
+        uint8_t cshllink_addVistaAndAboveIDListItem(struct _cshllink_extdatablk_viidldblk *viaail, uint8_t *data, uint16_t size);
         /*
             remove idl item
             IN: pointer to List of IDL items; index to be removed
             OUT: 0 - Success
                  255 - Error
         */
-        uint8_t cshllink_removeVistaAndAboveIDListItem(struct _cshllink_lnktidl_idl *list, uint8_t index);
+        uint8_t cshllink_removeVistaAndAboveIDListItem(struct _cshllink_extdatablk_viidldblk *viaail, uint8_t index);
 
     /*
         converts ansi to unicode
     */
     uint8_t cshllink_ansiToUni(char16_t *dest, char *src);
+
+    /*
+        strlen char16
+    */
+    size_t cshllink_strlen16(char16_t *src);
 
 #endif
