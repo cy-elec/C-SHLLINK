@@ -1,6 +1,6 @@
 # C-SHLLINK
 
-This library provides an interface for the MS Shell Link Binary File Format in C\
+This library provides an interface for the MS Shell Link Binary File Format in C
 
 Status: WIP - (Currently working on issues with extdata)
 
