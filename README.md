@@ -11,4 +11,4 @@ Status: WIP - (Currently working on issues with extdata)
 [Felix Kröhnert](https://github.com/Elec42)
 
 ## LICENSE
-[GNU GPL V3](LICENSE)
+[MIT](LICENSE)
