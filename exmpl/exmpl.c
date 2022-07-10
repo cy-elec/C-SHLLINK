@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <cshllink.h>
+#include "cshllink.h"
 #include <string.h>
 
 struct Test {
@@ -23,8 +23,8 @@ int main(void) {
     printf("%s: %d\n%s: %d\n", t->str, t->val, (t+1)->str, (t+1)->val);
 
     cshllink LNK1 = {0}, LNK2 = {0};
-    FILE *fp1 = fopen("../exmpl/Notion.lnk", "rb+");
-    FILE *fp2 = fopen("../exmpl/Spotify.lnk", "rb+");
+    FILE *fp1 = fopen("../exmpl/test1.lnk", "rb+");
+    FILE *fp2 = fopen("../exmpl/test2.lnk", "rb+");
 
     if(cshllink_loadFile(fp1, &LNK1)==255) {
         printf("ERR READ 1 0x%x\n", cshllink_error);

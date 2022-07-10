@@ -30,6 +30,5 @@ exmpl: $(LIBN)
 	$(CC) ../exmpl/exmpl.c $(CFLAGS) -o exmpl.o -I$(LIBSRC) -L$(LIBDIR) -lcshllink
 	-./exmpl.o
 	rm exmpl.o
-
 clean:
 	-rm *.o

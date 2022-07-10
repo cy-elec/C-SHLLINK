@@ -6,7 +6,7 @@
     The descriptions of the variables are taken directly from the official documentation.
 
     Author: Felix Kröhnert
-    License: GNU GPL V3 (refer to LICENSE for more information)
+    License: MIT (refer to LICENSE for more information)
 */
 
 #ifndef _CSHLLINK_H_

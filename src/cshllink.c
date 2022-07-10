@@ -6,7 +6,7 @@
     The descriptions of the variables are taken directly from the official documentation.
 
     Author: Felix Kröhnert
-    License: GNU GPL V3 (refer to LICENSE for more information)
+    License: MIT (refer to LICENSE for more information)
 */
 
 #include "cshllink.h"
@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+	// last error code
     uint8_t cshllink_error=0;
     /*
         -> open file descriptor of type FILE (R mode)
@@ -2231,9 +2232,8 @@
                 _cshllink_errint(_CSHLLINK_ERRX_NULLPSTRIENVDU);
             memcpy(inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetUnicode, data, len*2);
             len--;
-            while(len++<259) {
-                inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetUnicode[len]=0;
-            }
+            while(len++<259) inputStruct->cshllink_extdatablk.IconEnvironmentDataBlock.TargetUnicode[len]=0;
+
             return 0;
         }
 
